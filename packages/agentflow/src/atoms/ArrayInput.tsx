@@ -1,4 +1,4 @@
-import { type ComponentType, useCallback, useMemo, useRef, useState } from 'react'
+import { type ComponentType, useCallback, useMemo } from 'react'
 
 import { Box, Button, Chip, IconButton } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
@@ -7,6 +7,7 @@ import { IconPlus, IconTrash } from '@tabler/icons-react'
 import type { InputParam, NodeData } from '@/core/types'
 
 import { type AsyncInputProps, type ConfigInputComponentProps, NodeInputHandler } from './NodeInputHandler'
+import { useStableKeys } from './useStableKeys'
 
 export interface ArrayInputProps {
     inputParam: InputParam
@@ -42,33 +43,7 @@ export function ArrayInput({
         [data.inputValues, inputParam.name]
     )
 
-    // Stable keys for array items — avoids using index as React key.
-    // Keys are held in state so they persist across renders. A local variable
-    // (`effectiveKeys`) is used for the current render pass so that newly
-    // generated keys are available immediately (setState alone would only
-    // take effect on the *next* render, leaving keys undefined in this one).
-    const idCounterRef = useRef(0)
-    const [itemKeys, setItemKeys] = useState<string[]>(() => {
-        const initial: string[] = []
-        while (initial.length < arrayItems.length) {
-            initial.push(`item-${idCounterRef.current++}`)
-        }
-        return initial
-    })
-
-    let effectiveKeys = itemKeys
-    if (effectiveKeys.length < arrayItems.length) {
-        const nextKeys = [...effectiveKeys]
-        while (nextKeys.length < arrayItems.length) {
-            nextKeys.push(`item-${idCounterRef.current++}`)
-        }
-        setItemKeys(nextKeys)
-        effectiveKeys = nextKeys
-    } else if (effectiveKeys.length > arrayItems.length) {
-        const trimmed = effectiveKeys.slice(0, arrayItems.length)
-        setItemKeys(trimmed)
-        effectiveKeys = trimmed
-    }
+    const { keys: effectiveKeys, removeKey } = useStableKeys(arrayItems.length, 'item')
 
     // Use pre-computed itemParameters
     // Falls back to raw field definitions for nested arrays without show/hide conditions.
@@ -130,12 +105,12 @@ export function ArrayInput({
     const handleDeleteItem = useCallback(
         (indexToDelete: number) => {
             const updatedArrayItems = arrayItems.filter((_, i) => i !== indexToDelete)
-            setItemKeys((prev) => prev.filter((_, i) => i !== indexToDelete))
+            removeKey(indexToDelete)
 
             // Notify parent of change (parent will update props, causing re-render)
             onDataChange?.({ inputParam, newValue: updatedArrayItems })
         },
-        [arrayItems, inputParam, onDataChange]
+        [arrayItems, inputParam, onDataChange, removeKey]
     )
 
     // Pre-compute stable per-item onDataChange handlers to avoid new closures on every render

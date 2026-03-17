@@ -8,6 +8,7 @@ import type { InputParam, NodeData } from '@/core/types'
 
 import { ExpandTextDialog } from './ExpandTextDialog'
 import { RichTextEditor } from './RichTextEditor.lazy'
+import { useStableKeys } from './useStableKeys'
 
 const MESSAGE_ROLES = [
     { label: 'System', value: 'system' },
@@ -37,18 +38,13 @@ export interface MessagesInputProps {
  */
 export function MessagesInput({ inputParam, data, disabled = false, onDataChange }: MessagesInputProps) {
     const theme = useTheme()
-    const idCounterRef = useRef(0)
-    const itemKeysRef = useRef<string[]>([])
 
     const messages = useMemo(
         () => (Array.isArray(data.inputValues?.[inputParam.name]) ? (data.inputValues[inputParam.name] as MessageEntry[]) : []),
         [data.inputValues, inputParam.name]
     )
 
-    // Grow keys array synchronously so keys are available on the first render
-    while (itemKeysRef.current.length < messages.length) {
-        itemKeysRef.current.push(`message-${idCounterRef.current++}`)
-    }
+    const { keys: effectiveKeys, removeKey } = useStableKeys(messages.length, 'message')
 
     const handleRoleChange = useCallback(
         (index: number, role: string) => {
@@ -61,17 +57,17 @@ export function MessagesInput({ inputParam, data, disabled = false, onDataChange
 
     // Track latest inline content locally so the expand dialog always has fresh values,
     // even if the parent hasn't round-tripped onDataChange back into data yet.
-    // Keyed by itemKeysRef values so deletes are a simple Map.delete() with no index rebasing.
+    // Keyed by item key values so deletes are a simple Map.delete() with no index rebasing.
     const latestContentRef = useRef<Map<string, string>>(new Map())
 
     const handleContentChange = useCallback(
         (index: number, content: string) => {
-            latestContentRef.current.set(itemKeysRef.current[index], content)
+            latestContentRef.current.set(effectiveKeys[index], content)
             const updated = [...messages]
             updated[index] = { ...updated[index], content }
             onDataChange?.({ inputParam, newValue: updated })
         },
-        [messages, inputParam, onDataChange]
+        [effectiveKeys, messages, inputParam, onDataChange]
     )
 
     const handleAddMessage = useCallback(() => {
@@ -81,11 +77,11 @@ export function MessagesInput({ inputParam, data, disabled = false, onDataChange
 
     const handleDeleteMessage = useCallback(
         (indexToDelete: number) => {
-            latestContentRef.current.delete(itemKeysRef.current[indexToDelete])
-            itemKeysRef.current.splice(indexToDelete, 1)
+            latestContentRef.current.delete(effectiveKeys[indexToDelete])
+            removeKey(indexToDelete)
             onDataChange?.({ inputParam, newValue: messages.filter((_, i) => i !== indexToDelete) })
         },
-        [messages, inputParam, onDataChange]
+        [effectiveKeys, messages, inputParam, onDataChange, removeKey]
     )
 
     // Expand dialog state
@@ -98,12 +94,12 @@ export function MessagesInput({ inputParam, data, disabled = false, onDataChange
     const handleExpandConfirm = useCallback(
         (value: string) => {
             if (expandIndex !== null) {
-                latestContentRef.current.set(itemKeysRef.current[expandIndex], value)
+                latestContentRef.current.set(effectiveKeys[expandIndex], value)
                 handleContentChange(expandIndex, value)
             }
             setExpandIndex(null)
         },
-        [expandIndex, handleContentChange]
+        [effectiveKeys, expandIndex, handleContentChange]
     )
 
     const handleExpandCancel = useCallback(() => {
@@ -122,7 +118,7 @@ export function MessagesInput({ inputParam, data, disabled = false, onDataChange
 
             {messages.map((message, index) => (
                 <Box
-                    key={itemKeysRef.current[index]}
+                    key={effectiveKeys[index]}
                     sx={{
                         p: 2,
                         mt: 2,
@@ -232,7 +228,7 @@ export function MessagesInput({ inputParam, data, disabled = false, onDataChange
             {expandIndex !== null && (
                 <ExpandTextDialog
                     open={true}
-                    value={latestContentRef.current.get(itemKeysRef.current[expandIndex]) ?? messages[expandIndex]?.content ?? ''}
+                    value={latestContentRef.current.get(effectiveKeys[expandIndex]) ?? messages[expandIndex]?.content ?? ''}
                     title='Content'
                     placeholder='Message content (supports {{ variable }} syntax)'
                     disabled={disabled}
