@@ -128,6 +128,14 @@ Flowise has 3 different modules in a single mono repository.
     cd packages/agentflow && pnpm test
     ```
 
+    Or from the repo root using `--filter`:
+
+    ```bash
+    pnpm --filter flowise-components test
+    pnpm --filter @flowiseai/agentflow test
+    pnpm --filter "./packages/server" test # root and server share the same package name.
+    ```
+
 -   Or run all tests from the repo root:
 
     ```bash
