@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { Box, Button, Dialog, DialogActions, DialogContent, TextField, Typography } from '@mui/material'
 
@@ -10,8 +10,9 @@ export interface ExpandTextDialogProps {
     title?: string
     placeholder?: string
     disabled?: boolean
-    /** Editor mode — 'text' renders a plain TextField, 'richtext' renders the TipTap RichTextEditor. */
-    mode?: 'text' | 'richtext'
+    /** The input param type — determines which editor to render. 'string' uses the TipTap RichTextEditor; others fall back to a plain TextField. */
+    // TODO: handle 'code' type separately with a dedicated CodeMirror editor
+    inputType?: string
     onConfirm: (value: string) => void
     onCancel: () => void
 }
@@ -26,18 +27,22 @@ export function ExpandTextDialog({
     title,
     placeholder,
     disabled = false,
-    mode = 'text',
+    inputType = 'string',
     onConfirm,
     onCancel
 }: ExpandTextDialogProps) {
     const [localValue, setLocalValue] = useState(value)
+    const [prevOpen, setPrevOpen] = useState(open)
 
-    // Sync local state when the value prop changes while dialog is open
-    useEffect(() => {
-        if (open) {
-            setLocalValue(value)
-        }
-    }, [open, value])
+    // Sync localValue synchronously when the dialog opens so the TipTap editor
+    // initialises with the correct content (useEffect would leave a one-render
+    // gap where localValue is stale, causing the editor to show empty/old text).
+    if (open && !prevOpen) {
+        setLocalValue(value)
+        setPrevOpen(true)
+    } else if (!open && prevOpen) {
+        setPrevOpen(false)
+    }
 
     const handleConfirm = useCallback(() => {
         onConfirm(localValue)
@@ -51,7 +56,7 @@ export function ExpandTextDialog({
                         {title}
                     </Typography>
                 )}
-                {mode === 'richtext' ? (
+                {inputType === 'string' ? (
                     <Box
                         sx={{
                             borderRadius: '12px',
