@@ -12,6 +12,7 @@ import { useAgentflowContext, useConfigContext } from '@/infrastructure/store'
 
 import { AsyncInput } from './AsyncInput'
 import { ConfigInput } from './ConfigInput'
+import { useAvailableVariables } from './useAvailableVariables'
 import { useDynamicOutputPorts } from './useDynamicOutputPorts'
 
 /** Array param names that should render as MessagesInput instead of generic ArrayInput. */
@@ -59,6 +60,7 @@ function EditNodeDialogComponent({ show, dialogProps, onCancel }: EditNodeDialog
     // conditionAgentflow has an Else port; conditionAgentAgentflow does not
     const includeElse = !isConditionAgentNode
     const { cleanupOrphanedEdges } = useDynamicOutputPorts(data?.id ?? '', hasDynamicPorts, includeElse)
+    const variableItems = useAvailableVariables(data?.id ?? '')
 
     // Ref to read current data
     const dataRef = useRef(data)
@@ -378,6 +380,7 @@ function EditNodeDialogComponent({ show, dialogProps, onCancel }: EditNodeDialog
                                     AsyncInputComponent={AsyncInput}
                                     ConfigInputComponent={ConfigInput}
                                     onConfigChange={onConfigChange}
+                                    variableItems={inputParam.acceptVariable ? variableItems : undefined}
                                 />
                             )
                         })}

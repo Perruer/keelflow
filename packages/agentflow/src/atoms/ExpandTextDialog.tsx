@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 
 import { Box, Button, Dialog, DialogActions, DialogContent, TextField, Typography } from '@mui/material'
 
+import { CodeInput } from './CodeInput'
 import { RichTextEditor } from './RichTextEditor.lazy'
 
 export interface ExpandTextDialogProps {
@@ -10,9 +11,10 @@ export interface ExpandTextDialogProps {
     title?: string
     placeholder?: string
     disabled?: boolean
-    /** The input param type — determines which editor to render. 'string' uses the TipTap RichTextEditor; others fall back to a plain TextField. */
-    // TODO: handle 'code' type separately with a dedicated CodeMirror editor
+    /** The input param type — determines which editor to render. 'string' uses the TipTap RichTextEditor, 'code' renders CodeInput; others fall back to a plain TextField. */
     inputType?: string
+    /** Language hint for 'code' mode (e.g. 'javascript', 'python', 'json'). */
+    language?: string
     onConfirm: (value: string) => void
     onCancel: () => void
 }
@@ -28,6 +30,7 @@ export function ExpandTextDialog({
     placeholder,
     disabled = false,
     inputType = 'string',
+    language,
     onConfirm,
     onCancel
 }: ExpandTextDialogProps) {
@@ -56,7 +59,15 @@ export function ExpandTextDialog({
                         {title}
                     </Typography>
                 )}
-                {inputType === 'string' ? (
+                {inputType === 'code' ? (
+                    <CodeInput
+                        value={localValue}
+                        onChange={setLocalValue}
+                        language={language}
+                        disabled={disabled}
+                        height='calc(100vh - 220px)'
+                    />
+                ) : inputType === 'string' ? (
                     <Box
                         sx={{
                             borderRadius: '12px',
