@@ -196,13 +196,13 @@ const _csvToDatasetRows = async (datasetId: string, csvString: string, firstRowH
 }
 
 // Create new dataset
-const createDataset = async (body: any) => {
+const createDataset = async (body: any, workspaceId: string) => {
     try {
         const appServer = getRunningExpressApp()
         const newDs = new Dataset()
         newDs.name = body.name
         newDs.description = body.description
-        newDs.workspaceId = body.workspaceId
+        newDs.workspaceId = workspaceId
         const dataset = appServer.AppDataSource.getRepository(Dataset).create(newDs)
         const result = await appServer.AppDataSource.getRepository(Dataset).save(dataset)
         if (body.csvFile) {
@@ -252,6 +252,11 @@ const deleteDataset = async (id: string, workspaceId: string) => {
 const addDatasetRow = async (body: any) => {
     try {
         const appServer = getRunningExpressApp()
+        const dataset = await appServer.AppDataSource.getRepository(Dataset).findOneBy({
+            id: body.datasetId,
+            workspaceId: body.workspaceId
+        })
+        if (!dataset) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Dataset ${body.datasetId} not found`)
         if (body.csvFile) {
             await _csvToDatasetRows(body.datasetId, body.csvFile, body.firstRowHeaders)
             await changeUpdateOnDataset(body.datasetId, body.workspaceId)
@@ -313,6 +318,12 @@ const updateDatasetRow = async (id: string, body: any) => {
             id: id
         })
         if (!item) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Dataset Row ${id} not found`)
+
+        const dataset = await appServer.AppDataSource.getRepository(Dataset).findOneBy({
+            id: item.datasetId,
+            workspaceId: body.workspaceId
+        })
+        if (!dataset) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Dataset Row ${id} not found`)
 
         item.input = body.input
         item.output = body.output
