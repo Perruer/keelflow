@@ -200,7 +200,9 @@ const createDataset = async (body: any) => {
     try {
         const appServer = getRunningExpressApp()
         const newDs = new Dataset()
-        Object.assign(newDs, body)
+        newDs.name = body.name
+        newDs.description = body.description
+        newDs.workspaceId = body.workspaceId
         const dataset = appServer.AppDataSource.getRepository(Dataset).create(newDs)
         const result = await appServer.AppDataSource.getRepository(Dataset).save(dataset)
         if (body.csvFile) {
@@ -222,9 +224,8 @@ const updateDataset = async (id: string, body: any, workspaceId: string) => {
         })
         if (!dataset) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Dataset ${id} not found`)
 
-        const updateDataset = new Dataset()
-        Object.assign(updateDataset, body)
-        appServer.AppDataSource.getRepository(Dataset).merge(dataset, updateDataset)
+        dataset.name = body.name
+        dataset.description = body.description
         const result = await appServer.AppDataSource.getRepository(Dataset).save(dataset)
         return result
     } catch (error) {
@@ -271,7 +272,9 @@ const addDatasetRow = async (body: any) => {
                 sequenceNo = maxValueEntity[0].sequenceNo
             }
             const newDs = new DatasetRow()
-            Object.assign(newDs, body)
+            newDs.input = body.input
+            newDs.output = body.output
+            newDs.datasetId = body.datasetId
             newDs.sequenceNo = sequenceNo === 0 ? sequenceNo : sequenceNo + 1
             const row = appServer.AppDataSource.getRepository(DatasetRow).create(newDs)
             const result = await appServer.AppDataSource.getRepository(DatasetRow).save(row)
@@ -311,11 +314,10 @@ const updateDatasetRow = async (id: string, body: any) => {
         })
         if (!item) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Dataset Row ${id} not found`)
 
-        const updateItem = new DatasetRow()
-        Object.assign(updateItem, body)
-        appServer.AppDataSource.getRepository(DatasetRow).merge(item, updateItem)
+        item.input = body.input
+        item.output = body.output
         const result = await appServer.AppDataSource.getRepository(DatasetRow).save(item)
-        await changeUpdateOnDataset(body.datasetId, body.workspaceId)
+        await changeUpdateOnDataset(item.datasetId, body.workspaceId)
         return result
     } catch (error) {
         throw new InternalFlowiseError(
