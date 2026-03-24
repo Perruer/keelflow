@@ -55,7 +55,7 @@ const createDataset = async (req: Request, res: Response, next: NextFunction) =>
             )
         }
         body.workspaceId = workspaceId
-        const apiResponse = await datasetService.createDataset(body)
+        const apiResponse = await datasetService.createDataset(body, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
         next(error)
