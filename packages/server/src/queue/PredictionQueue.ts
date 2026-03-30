@@ -63,9 +63,6 @@ export class PredictionQueue extends BaseQueue {
     }
 
     async processJob(data: IExecuteFlowParams | IGenerateAgentflowv2Params) {
-        if (this.redisPublisher) {
-            await this.redisPublisher.connect()
-        }
         if (this.appDataSource) data.appDataSource = this.appDataSource
         if (this.telemetry) data.telemetry = this.telemetry
         if (this.cachePool) data.cachePool = this.cachePool

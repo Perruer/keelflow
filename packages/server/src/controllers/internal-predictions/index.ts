@@ -33,7 +33,6 @@ const createInternalPrediction = async (req: Request, res: Response, next: NextF
 const createAndStreamInternalPrediction = async (req: Request, res: Response, next: NextFunction) => {
     const chatId = req.body.chatId
     const sseStreamer = getRunningExpressApp().sseStreamer
-    const isQueueMode = process.env.MODE === MODE.QUEUE
 
     try {
         sseStreamer.addClient(chatId, res)
@@ -43,8 +42,8 @@ const createAndStreamInternalPrediction = async (req: Request, res: Response, ne
         res.setHeader('X-Accel-Buffering', 'no') //nginx config: https://serverfault.com/a/801629
         res.flushHeaders()
 
-        if (isQueueMode) {
-            await getRunningExpressApp().redisSubscriber.subscribe(chatId)
+        if (process.env.MODE === MODE.QUEUE) {
+            getRunningExpressApp().redisSubscriber.subscribe(chatId)
         }
 
         const apiResponse = await utilBuildChatflow(req, true)
@@ -55,9 +54,6 @@ const createAndStreamInternalPrediction = async (req: Request, res: Response, ne
         }
         next(error)
     } finally {
-        if (isQueueMode && chatId) {
-            await getRunningExpressApp().redisSubscriber.unsubscribe(chatId)
-        }
         sseStreamer.removeClient(chatId)
     }
 }
