@@ -84,7 +84,7 @@
         "build": "vite build",
         "test": "jest",
         "clean": "rimraf build",
-        "nuke": "rimraf build node_modules .turbo"
+        "nuke": "pnpm clean && rimraf node_modules .turbo"
     },
     "babel": {
         "presets": [
