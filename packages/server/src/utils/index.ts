@@ -568,10 +568,11 @@ export const buildFlow = async ({
 
     const flowData: ICommonObject = {
         chatflowid,
+        chatflowId: chatflowid,
         chatId,
         sessionId,
         chatHistory,
-        ...overrideConfig
+        apiMessageId
     }
     while (nodeQueue.length) {
         const { nodeId, depth } = nodeQueue.shift() as INodeQueue
