@@ -13,7 +13,6 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter'
 import { Express } from 'express'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { ExpressAdapter } from '@bull-board/express'
-import { IdentityManager } from '../IdentityManager'
 
 const QUEUE_NAME = process.env.QUEUE_NAME || 'flowise-queue'
 
@@ -121,7 +120,6 @@ export class QueueManager {
         appDataSource,
         abortControllerPool,
         usageCacheManager,
-        identityManager,
         serverAdapter
     }: {
         componentNodes: IComponentNodes
@@ -130,7 +128,6 @@ export class QueueManager {
         appDataSource: DataSource
         abortControllerPool: AbortControllerPool
         usageCacheManager: UsageCacheManager
-        identityManager: IdentityManager
         serverAdapter?: ExpressAdapter
     }) {
         const predictionQueueName = `${QUEUE_NAME}-prediction`
@@ -164,8 +161,7 @@ export class QueueManager {
             telemetry,
             cachePool,
             appDataSource,
-            usageCacheManager,
-            identityManager
+            usageCacheManager
         })
         this.registerQueue('schedule', scheduleQueue)
 

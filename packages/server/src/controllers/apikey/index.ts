@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { LoggedInUser } from '../../enterprise/Interface.Enterprise'
+import { LoggedInUser } from '../../identity'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import apikeyService from '../../services/apikey'
 import { getPageAndLimitParams } from '../../utils/pagination'

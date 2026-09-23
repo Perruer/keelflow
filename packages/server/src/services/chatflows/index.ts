@@ -11,8 +11,8 @@ import { ChatMessage } from '../../database/entities/ChatMessage'
 import { ChatMessageFeedback } from '../../database/entities/ChatMessageFeedback'
 import { ScheduleTriggerType } from '../../database/entities/ScheduleRecord'
 import { UpsertHistory } from '../../database/entities/UpsertHistory'
-import { Workspace } from '../../enterprise/database/entities/workspace.entity'
-import { getWorkspaceSearchOptions } from '../../enterprise/utils/ControllerServiceUtils'
+import { Workspace } from '../../database/entities/Workspace'
+import { getWorkspaceSearchOptions } from '../../identity'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { ScheduleBeat } from '../../schedule/ScheduleBeat'
@@ -429,7 +429,7 @@ const saveChatflow = async (
         }
     }
 
-    const productId = await appServer.identityManager.getProductIdFromSubscription(subscriptionId)
+    const productId = ''
 
     await appServer.telemetry.sendTelemetry(
         'chatflow_created',

@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { v4 as uuidv4 } from 'uuid'
 import { ApiKey } from '../../database/entities/ApiKey'
-import { LoggedInUser } from '../../enterprise/Interface.Enterprise'
+import { LoggedInUser } from '../../identity'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { Platform } from '../../Interface'
@@ -26,64 +26,6 @@ function validatePermissions(user: LoggedInUser, requestedPermissions: string[],
 
     if (hasRestrictedPermissions) {
         throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, `Cannot ${operation} API key with workspace or admin permissions`)
-    }
-
-    // For Cloud platform, check feature-gated permissions
-    // This also applies to ALL users, including admins (platform constraint)
-    const appServer = getRunningExpressApp()
-    if (appServer.identityManager.getPlatformType() === Platform.CLOUD) {
-        if (!user.features) {
-            // On Cloud platform, user features should always exist
-            // Log the anomaly with context for debugging
-            logger.error(
-                `[server]: Missing user features on Cloud platform for ${operation} API key. ` +
-                    `User: ${user.email || user.id}, ` +
-                    `Organization: ${user.activeOrganizationId || 'unknown'}, ` +
-                    `Subscription: ${user.activeOrganizationSubscriptionId || 'unknown'}, ` +
-                    `Customer: ${user.activeOrganizationCustomerId || 'unknown'}, ` +
-                    `Workspace: ${user.activeWorkspaceId || 'unknown'}`
-            )
-            throw new InternalFlowiseError(StatusCodes.INTERNAL_SERVER_ERROR, `Unable to validate permissions: user features not available`)
-        }
-
-        const featureToPermissionMap: { [key: string]: string[] } = {
-            'feat:login-activity': ['loginActivity:'],
-            'feat:logs': ['logs:'],
-            'feat:roles': ['roles:'],
-            'feat:share': ['credentials:share', 'templates:custom-share'],
-            'feat:sso-config': ['sso:'],
-            'feat:users': ['users:'],
-            'feat:workspaces': ['workspace:']
-        }
-
-        const disabledFeatures = Object.entries(user.features).filter(([, value]) => value === 'false')
-        const disabledPermissionPrefixes: string[] = []
-        disabledFeatures.forEach(([featureKey]) => {
-            const prefixes = featureToPermissionMap[featureKey]
-            if (prefixes) {
-                disabledPermissionPrefixes.push(...prefixes)
-            }
-        })
-
-        const hasDisabledFeaturePermissions = requestedPermissions.some((permission: string) =>
-            disabledPermissionPrefixes.some((prefix) => permission.startsWith(prefix))
-        )
-
-        if (hasDisabledFeaturePermissions) {
-            throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, `Cannot ${operation} API key with permissions for disabled features`)
-        }
-    }
-
-    // User permission validation - only applies to non-admins (authorization check)
-    if (!user.isOrganizationAdmin) {
-        // Check if all requested permissions are included in user permissions
-        const hasInvalidPermissions = requestedPermissions.some((permission: string) => !user.permissions.includes(permission))
-        if (hasInvalidPermissions) {
-            throw new InternalFlowiseError(
-                StatusCodes.BAD_REQUEST,
-                `Cannot ${operation} API key with permissions that exceed your own permissions`
-            )
-        }
     }
 }
 

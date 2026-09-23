@@ -1,6 +1,6 @@
 import express from 'express'
 import textToSpeechController from '../../controllers/text-to-speech'
-import { checkAnyPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkAnyPermission } from '../../identity'
 
 const router = express.Router()
 

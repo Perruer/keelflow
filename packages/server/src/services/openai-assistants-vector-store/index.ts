@@ -1,7 +1,6 @@
 import OpenAI from 'openai'
 import { StatusCodes } from 'http-status-codes'
 import { Credential } from '../../database/entities/Credential'
-import { WorkspaceShared } from '../../enterprise/database/entities/EnterpriseEntities'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
@@ -25,16 +24,6 @@ const resolveCredentialForWorkspace = async (credentialId: string, workspaceId: 
         id: credentialId,
         workspaceId
     })
-    if (!credential) {
-        const share = await appServer.AppDataSource.getRepository(WorkspaceShared).findOneBy({
-            workspaceId,
-            sharedItemId: credentialId,
-            itemType: 'credential'
-        })
-        if (share) {
-            credential = await credentialRepo.findOneBy({ id: credentialId })
-        }
-    }
     if (credential) {
         return credential
     }

@@ -1,6 +1,6 @@
 import express from 'express'
 import nodesRouter from '../../controllers/nodes'
-import { checkAnyPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkAnyPermission } from '../../identity'
 const router = express.Router()
 
 // CREATE

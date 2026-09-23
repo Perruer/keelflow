@@ -1,6 +1,6 @@
 import express from 'express'
 import customMcpServersController from '../../controllers/custom-mcp-servers'
-import { checkAnyPermission, checkPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkAnyPermission, checkPermission } from '../../identity'
 
 const router = express.Router()
 

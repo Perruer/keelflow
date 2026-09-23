@@ -44,19 +44,8 @@ import { AddWebhookSecretToChatFlow1776240000000 } from './1776240000000-AddWebh
 import { AddCustomMcpServer1766000000000 } from './1766000000000-AddCustomMcpServer'
 import { AddMcpServerConfigToChatFlow1767000000000 } from './1767000000000-AddMcpServerConfigToChatFlow'
 import { AddScheduleEntities1772000000000 } from './1772000000000-AddScheduleEntities'
-import { AddSSOIdentityBinding1780000000000 } from '../../../enterprise/database/migrations/sqlite/1780000000000-AddSSOIdentityBinding'
 
-import { AddAuthTables1720230151482 } from '../../../enterprise/database/migrations/sqlite/1720230151482-AddAuthTables'
-import { AddWorkspace1720230151484 } from '../../../enterprise/database/migrations/sqlite/1720230151484-AddWorkspace'
-import { AddWorkspaceShared1726654922034 } from '../../../enterprise/database/migrations/sqlite/1726654922034-AddWorkspaceShared'
-import { AddWorkspaceIdToCustomTemplate1726655750383 } from '../../../enterprise/database/migrations/sqlite/1726655750383-AddWorkspaceIdToCustomTemplate'
-import { AddOrganization1727798417345 } from '../../../enterprise/database/migrations/sqlite/1727798417345-AddOrganization'
-import { LinkWorkspaceId1729130948686 } from '../../../enterprise/database/migrations/sqlite/1729130948686-LinkWorkspaceId'
-import { LinkOrganizationId1729133111652 } from '../../../enterprise/database/migrations/sqlite/1729133111652-LinkOrganizationId'
-import { AddSSOColumns1730519457880 } from '../../../enterprise/database/migrations/sqlite/1730519457880-AddSSOColumns'
-import { AddPersonalWorkspace1734074497540 } from '../../../enterprise/database/migrations/sqlite/1734074497540-AddPersonalWorkspace'
-import { RefactorEnterpriseDatabase1737076223692 } from '../../../enterprise/database/migrations/sqlite/1737076223692-RefactorEnterpriseDatabase'
-import { ExecutionLinkWorkspaceId1746862866554 } from '../../../enterprise/database/migrations/sqlite/1746862866554-ExecutionLinkWorkspaceId'
+import { KeelflowAuthSession1790000000000, KeelflowIdentityTables1720230151483, KeelflowWorkspaceColumns1738090872626 } from '../keelflow'
 
 export const sqliteMigrations = [
     Init1693835579790,
@@ -91,21 +80,10 @@ export const sqliteMigrations = [
     AddFollowUpPrompts1726666294213,
     AddTypeToAssistant1733011290987,
     AddCustomTemplate1725629836652,
-    AddAuthTables1720230151482,
-    AddWorkspace1720230151484,
-    AddWorkspaceShared1726654922034,
-    AddWorkspaceIdToCustomTemplate1726655750383,
-    AddOrganization1727798417345,
-    LinkWorkspaceId1729130948686,
-    LinkOrganizationId1729133111652,
-    AddSSOColumns1730519457880,
     AddSeqNoToDatasetRow1733752119696,
-    AddPersonalWorkspace1734074497540,
-    RefactorEnterpriseDatabase1737076223692,
     AddExecutionEntity1738090872625,
     FixOpenSourceAssistantTable1743758056188,
     AddErrorToEvaluationRun1744964560174,
-    ExecutionLinkWorkspaceId1746862866554,
     AddTextToSpeechToChatFlow1754986486669,
     ModifyChatflowType1755066758601,
     AddTextToSpeechToChatFlow1759419136055,
@@ -116,5 +94,7 @@ export const sqliteMigrations = [
     AddCustomMcpServer1766000000000,
     AddMcpServerConfigToChatFlow1767000000000,
     AddScheduleEntities1772000000000,
-    AddSSOIdentityBinding1780000000000
+    KeelflowIdentityTables1720230151483,
+    KeelflowWorkspaceColumns1738090872626,
+    KeelflowAuthSession1790000000000
 ]

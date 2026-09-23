@@ -1,6 +1,6 @@
 import express from 'express'
 import evaluationsController from '../../controllers/evaluations'
-import { checkPermission, checkAnyPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkPermission, checkAnyPermission } from '../../identity'
 const router = express.Router()
 
 router.get('/', checkPermission('evaluations:view'), evaluationsController.getAllEvaluations)

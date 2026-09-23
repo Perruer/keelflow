@@ -243,11 +243,18 @@ const SignInPage = () => {
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
                                 <Input inputParam={passwordInput} onChange={(newValue) => setPasswordVal(newValue)} value={passwordVal} />
-                                <Typography variant='body2' sx={{ color: theme.palette.grey[600], mt: 1, textAlign: 'right' }}>
-                                    <Link style={{ color: theme.palette.primary.main }} to='/forgot-password'>
-                                        Forgot password?
-                                    </Link>
-                                </Typography>
+                                {isOpenSource ? (
+                                    <Typography variant='body2' sx={{ color: theme.palette.grey[600], mt: 1, textAlign: 'right' }}>
+                                        Forgot password? Reset it on the server:{' '}
+                                        <code>keelflow user &lt;email&gt; &lt;new-password&gt;</code>
+                                    </Typography>
+                                ) : (
+                                    <Typography variant='body2' sx={{ color: theme.palette.grey[600], mt: 1, textAlign: 'right' }}>
+                                        <Link style={{ color: theme.palette.primary.main }} to='/forgot-password'>
+                                            Forgot password?
+                                        </Link>
+                                    </Typography>
+                                )}
                             </Box>
                             <LoadingButton
                                 loading={loading}

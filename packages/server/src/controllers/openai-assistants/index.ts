@@ -7,7 +7,7 @@ import { StatusCodes } from 'http-status-codes'
 import { streamStorageFile } from 'flowise-components'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { ChatFlow } from '../../database/entities/ChatFlow'
-import { Workspace } from '../../enterprise/database/entities/workspace.entity'
+import { Workspace } from '../../database/entities/Workspace'
 import { validateFileMimeTypeAndExtensionMatch } from '../../utils/fileValidation'
 
 // List available assistants

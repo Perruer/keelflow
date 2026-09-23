@@ -1,6 +1,6 @@
 import express from 'express'
 import datasetController from '../../controllers/dataset'
-import { checkAnyPermission, checkPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkAnyPermission, checkPermission } from '../../identity'
 const router = express.Router()
 
 // get all datasets

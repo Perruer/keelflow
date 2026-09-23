@@ -48,9 +48,9 @@ export const RequireAuth = ({ permission, display, children }) => {
     }
 
     // Step 2: Deployment Type Specific Logic
-    // Open Source: Only show features without display property
+    // Open Source: the owner can use every feature the server turned on
     if (isOpenSource) {
-        return !display ? children : <Navigate to='/unauthorized' replace />
+        return !display ? children : checkFeatureFlag(features, display, children)
     }
 
     // Cloud & Enterprise: Check both permissions and feature flags

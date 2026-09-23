@@ -1,6 +1,6 @@
 import express from 'express'
 import chatMessagesController from '../../controllers/chat-messages'
-import { checkAnyPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkAnyPermission } from '../../identity'
 const router = express.Router()
 
 // CREATE

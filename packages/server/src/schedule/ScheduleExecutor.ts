@@ -12,8 +12,8 @@ import { IServerSideEventStreamer } from 'flowise-components'
 import { ScheduleRecord, ScheduleTriggerType } from '../database/entities/ScheduleRecord'
 import { ScheduleTriggerStatus } from '../database/entities/ScheduleTriggerLog'
 import { ChatFlow } from '../database/entities/ChatFlow'
-import { Workspace } from '../enterprise/database/entities/workspace.entity'
-import { Organization } from '../enterprise/database/entities/organization.entity'
+import { Workspace } from '../database/entities/Workspace'
+import { Organization } from '../database/entities/Organization'
 import { executeAgentFlow } from '../utils/buildAgentflow'
 import { checkPredictions, updatePredictionsUsage } from '../utils/quotaUsage'
 import scheduleService from '../services/schedule'
@@ -22,7 +22,6 @@ import { CachePool } from '../CachePool'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { v4 as uuidv4 } from 'uuid'
 import logger from '../utils/logger'
-import { IdentityManager } from '../IdentityManager'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -37,7 +36,6 @@ export interface ScheduleExecutionContext {
     cachePool: CachePool
     usageCacheManager: UsageCacheManager
     sseStreamer: IServerSideEventStreamer
-    identityManager: IdentityManager
 }
 
 /**
@@ -145,7 +143,7 @@ export async function executeScheduleJob(
 // ─── Internal ──────────────────────────────────────────────────────────────────
 
 async function _executeAgentflow(ctx: ScheduleExecutionContext, record: ScheduleRecord, scheduledAt: Date): Promise<any> {
-    const { appDataSource, componentNodes, telemetry, cachePool, usageCacheManager, sseStreamer, identityManager } = ctx
+    const { appDataSource, componentNodes, telemetry, cachePool, usageCacheManager, sseStreamer } = ctx
     const startTime = Date.now()
 
     const log = await scheduleService.createTriggerLog({
@@ -172,8 +170,9 @@ async function _executeAgentflow(ctx: ScheduleExecutionContext, record: Schedule
         if (!org) throw new Error(`Organization ${workspace.organizationId} not found`)
 
         const orgId = org.id
-        const subscriptionId = org.subscriptionId as string
-        const productId = await identityManager.getProductIdFromSubscription(subscriptionId)
+        // No plans or billing in Keelflow
+        const subscriptionId = ''
+        const productId = ''
 
         await checkPredictions(org.id, subscriptionId, usageCacheManager)
 

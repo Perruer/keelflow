@@ -1,6 +1,6 @@
 import express from 'express'
 import executionController from '../../controllers/executions'
-import { checkAnyPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkAnyPermission } from '../../identity'
 const router = express.Router()
 
 // READ

@@ -1,8 +1,3 @@
-import Auth0SSO from '../enterprise/sso/Auth0SSO'
-import AzureSSO from '../enterprise/sso/AzureSSO'
-import GithubSSO from '../enterprise/sso/GithubSSO'
-import GoogleSSO from '../enterprise/sso/GoogleSSO'
-
 export const WHITELIST_URLS = [
     '/api/v1/verify/apikey/',
     '/api/v1/chatflows/apikey/',
@@ -29,42 +24,15 @@ export const WHITELIST_URLS = [
     '/api/v1/auth/refreshToken',
     '/api/v1/settings',
     '/api/v1/account/logout',
-    '/api/v1/account/verify',
     '/api/v1/account/register',
-    '/api/v1/account/resend-verification',
-    '/api/v1/account/forgot-password',
-    '/api/v1/account/reset-password',
-    '/api/v1/account/confirm-email-change',
-    '/api/v1/loginmethod/default',
-    '/api/v1/pricing',
-    '/api/v1/user/test',
     '/api/v1/oauth2-credential/callback',
     '/api/v1/oauth2-credential/refresh',
     '/api/v1/mcp/',
     '/api/v1/text-to-speech/generate',
-    '/api/v1/text-to-speech/abort',
-    AzureSSO.LOGIN_URI,
-    AzureSSO.LOGOUT_URI,
-    AzureSSO.CALLBACK_URI,
-    GoogleSSO.LOGIN_URI,
-    GoogleSSO.LOGOUT_URI,
-    GoogleSSO.CALLBACK_URI,
-    Auth0SSO.LOGIN_URI,
-    Auth0SSO.LOGOUT_URI,
-    Auth0SSO.CALLBACK_URI,
-    GithubSSO.LOGIN_URI,
-    GithubSSO.LOGOUT_URI,
-    GithubSSO.CALLBACK_URI
+    '/api/v1/text-to-speech/abort'
 ]
 
-export const API_KEY_BLACKLIST_URLS = [
-    '/api/v1/nvidia-nim',
-    '/api/v1/account/delete',
-    '/api/v1/files',
-    '/api/v1/organizationuser',
-    '/api/v1/workspace',
-    '/api/v1/workspaceuser'
-]
+export const API_KEY_BLACKLIST_URLS = ['/api/v1/nvidia-nim', '/api/v1/account/delete', '/api/v1/files', '/api/v1/user', '/api/v1/auth']
 
 export const enum GeneralErrorMessage {
     FORBIDDEN = 'Forbidden',

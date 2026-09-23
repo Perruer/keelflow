@@ -2,9 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { omit } from 'lodash'
 import { ICredentialReturnResponse } from '../../Interface'
 import { Credential } from '../../database/entities/Credential'
-import { WorkspaceShared } from '../../enterprise/database/entities/EnterpriseEntities'
-import { WorkspaceService } from '../../enterprise/services/workspace.service'
-import { getWorkspaceSearchOptions } from '../../enterprise/utils/ControllerServiceUtils'
+import { getWorkspaceSearchOptions } from '../../identity'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { decryptCredentialData, transformToCredentialEntity, REDACTED_CREDENTIAL_VALUE } from '../../utils'
@@ -70,49 +68,10 @@ const getAllCredentials = async (paramCredentialName: any, workspaceId: string) 
                 const credentials = await appServer.AppDataSource.getRepository(Credential).findBy(searchOptions)
                 dbResponse = credentials.map((c) => omit(c, ['encryptedData']))
             }
-            // get shared credentials
-            if (workspaceId) {
-                const workspaceService = new WorkspaceService()
-                const sharedItems = (await workspaceService.getSharedItemsForWorkspace(workspaceId, 'credential')) as Credential[]
-                if (sharedItems.length) {
-                    for (const sharedItem of sharedItems) {
-                        // Check if paramCredentialName is array
-                        if (Array.isArray(paramCredentialName)) {
-                            for (let i = 0; i < paramCredentialName.length; i += 1) {
-                                const name = paramCredentialName[i] as string
-                                if (sharedItem.credentialName === name) {
-                                    // @ts-ignore
-                                    sharedItem.shared = true
-                                    dbResponse.push(omit(sharedItem, ['encryptedData']))
-                                }
-                            }
-                        } else {
-                            if (sharedItem.credentialName === paramCredentialName) {
-                                // @ts-ignore
-                                sharedItem.shared = true
-                                dbResponse.push(omit(sharedItem, ['encryptedData']))
-                            }
-                        }
-                    }
-                }
-            }
         } else {
             const credentials = await appServer.AppDataSource.getRepository(Credential).findBy(getWorkspaceSearchOptions(workspaceId))
             for (const credential of credentials) {
                 dbResponse.push(omit(credential, ['encryptedData']))
-            }
-
-            // get shared credentials
-            if (workspaceId) {
-                const workspaceService = new WorkspaceService()
-                const sharedItems = (await workspaceService.getSharedItemsForWorkspace(workspaceId, 'credential')) as Credential[]
-                if (sharedItems.length) {
-                    for (const sharedItem of sharedItems) {
-                        // @ts-ignore
-                        sharedItem.shared = true
-                        dbResponse.push(omit(sharedItem, ['encryptedData']))
-                    }
-                }
             }
         }
         return dbResponse
@@ -145,18 +104,6 @@ const getCredentialById = async (credentialId: string, workspaceId: string): Pro
             plainDataObj: decryptedCredentialData
         }
         const dbResponse: any = omit(returnCredential, ['encryptedData'])
-        if (workspaceId) {
-            const shared = await appServer.AppDataSource.getRepository(WorkspaceShared).count({
-                where: {
-                    workspaceId: workspaceId,
-                    sharedItemId: credentialId,
-                    itemType: 'credential'
-                }
-            })
-            if (shared > 0) {
-                dbResponse.shared = true
-            }
-        }
         return dbResponse
     } catch (error) {
         throw new InternalFlowiseError(
@@ -193,10 +140,10 @@ const updateCredential = async (credentialId: string, requestBody: any, workspac
 }
 
 /**
- * Confirms a credential exists and belongs to (or is shared with) the given workspace.
+ * Confirms a credential exists and belongs to the given workspace.
  * Does NOT decrypt or return credential material — only used for authorization checks.
  * Throws 400 when workspaceId is missing (prevents unscoped lookup), 404 when the
- * credential does not belong to the workspace or is not shared with it.
+ * credential does not belong to the workspace.
  */
 const assertCredentialInWorkspace = async (credentialId: string, workspaceId: string | undefined): Promise<void> => {
     if (!workspaceId) {
@@ -208,15 +155,6 @@ const assertCredentialInWorkspace = async (credentialId: string, workspaceId: st
         workspaceId: workspaceId
     })
     if (owned) return
-
-    const shared = await appServer.AppDataSource.getRepository(WorkspaceShared).count({
-        where: {
-            workspaceId: workspaceId,
-            sharedItemId: credentialId,
-            itemType: 'credential'
-        }
-    })
-    if (shared > 0) return
 
     throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Credential ${credentialId} not found`)
 }

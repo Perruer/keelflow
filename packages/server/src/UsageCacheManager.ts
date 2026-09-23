@@ -3,17 +3,6 @@ import KeyvRedis from '@keyv/redis'
 import { Cache, createCache } from 'cache-manager'
 import { MODE } from './Interface'
 import { LICENSE_QUOTAS } from './utils/constants'
-import { StripeManager } from './StripeManager'
-import { InternalFlowiseError } from './errors/internalFlowiseError'
-import { StatusCodes } from 'http-status-codes'
-
-const DISABLED_QUOTAS = {
-    [LICENSE_QUOTAS.PREDICTIONS_LIMIT]: 0,
-    [LICENSE_QUOTAS.STORAGE_LIMIT]: 0, // in MB
-    [LICENSE_QUOTAS.FLOWS_LIMIT]: 0,
-    [LICENSE_QUOTAS.USERS_LIMIT]: 0,
-    [LICENSE_QUOTAS.ADDITIONAL_SEATS_LIMIT]: 0
-}
 
 const UNLIMITED_QUOTAS = {
     [LICENSE_QUOTAS.PREDICTIONS_LIMIT]: -1,
@@ -86,79 +75,14 @@ export class UsageCacheManager {
         }
     }
 
-    public async getSubscriptionDetails(subscriptionId: string, withoutCache: boolean = false): Promise<Record<string, any>> {
-        const stripeManager = await StripeManager.getInstance()
-        if (!stripeManager || !subscriptionId) {
-            return UNLIMITED_QUOTAS
-        }
-
-        // Skip cache if withoutCache is true
-        if (!withoutCache) {
-            const subscriptionData = await this.getSubscriptionDataFromCache(subscriptionId)
-            if (subscriptionData?.subsriptionDetails) {
-                return subscriptionData.subsriptionDetails
-            }
-        }
-
-        // If not in cache, retrieve from Stripe
-        const subscription = await stripeManager.getStripe().subscriptions.retrieve(subscriptionId)
-        if (subscription.status === 'canceled') throw new InternalFlowiseError(StatusCodes.UNAUTHORIZED, 'Subscription is canceled')
-
-        // Update subscription data cache
-        await this.updateSubscriptionDataToCache(subscriptionId, { subsriptionDetails: stripeManager.getSubscriptionObject(subscription) })
-
-        return stripeManager.getSubscriptionObject(subscription)
+    /** Keelflow has no plans or billing: nothing to look up */
+    public async getSubscriptionDetails(_subscriptionId: string, _withoutCache: boolean = false): Promise<Record<string, any>> {
+        return {}
     }
 
-    public async getQuotas(subscriptionId: string, withoutCache: boolean = false): Promise<Record<string, number>> {
-        const stripeManager = await StripeManager.getInstance()
-        if (!stripeManager || !subscriptionId) {
-            return UNLIMITED_QUOTAS
-        }
-
-        // Skip cache if withoutCache is true
-        if (!withoutCache) {
-            const subscriptionData = await this.getSubscriptionDataFromCache(subscriptionId)
-            if (subscriptionData?.quotas) {
-                return subscriptionData.quotas
-            }
-        }
-
-        // If not in cache, retrieve from Stripe
-        const subscription = await stripeManager.getStripe().subscriptions.retrieve(subscriptionId)
-        if (subscription.status === 'canceled') throw new InternalFlowiseError(StatusCodes.UNAUTHORIZED, 'Subscription is canceled')
-        const items = subscription.items.data
-        if (items.length === 0) {
-            return DISABLED_QUOTAS
-        }
-
-        const productId = items[0].price.product as string
-        const product = await stripeManager.getStripe().products.retrieve(productId)
-        const productMetadata = product.metadata
-
-        if (!productMetadata || Object.keys(productMetadata).length === 0) {
-            return DISABLED_QUOTAS
-        }
-
-        const quotas: Record<string, number> = {}
-        for (const key in productMetadata) {
-            if (key.startsWith('quota:')) {
-                quotas[key] = parseInt(productMetadata[key])
-            }
-        }
-
-        const additionalSeatsItem = subscription.items.data.find(
-            (item) => (item.price.product as string) === process.env.ADDITIONAL_SEAT_ID
-        )
-        quotas[LICENSE_QUOTAS.ADDITIONAL_SEATS_LIMIT] = additionalSeatsItem?.quantity || 0
-
-        // Update subscription data cache with quotas
-        await this.updateSubscriptionDataToCache(subscriptionId, {
-            quotas,
-            subsriptionDetails: stripeManager.getSubscriptionObject(subscription)
-        })
-
-        return quotas
+    /** Keelflow has no usage limits */
+    public async getQuotas(_subscriptionId: string, _withoutCache: boolean = false): Promise<Record<string, number>> {
+        return { ...UNLIMITED_QUOTAS }
     }
 
     public async getSubscriptionDataFromCache(subscriptionId: string) {

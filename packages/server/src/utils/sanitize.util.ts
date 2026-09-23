@@ -1,4 +1,4 @@
-import { User } from '../enterprise/database/entities/user.entity'
+import { User } from '../database/entities/User'
 import { isIPv4, isIPv6, isValidIPAddress } from './ipValidation'
 
 export function sanitizeNullBytes(obj: any): any {

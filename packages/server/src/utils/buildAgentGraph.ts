@@ -26,7 +26,7 @@ import { InternalFlowiseError } from '../errors/internalFlowiseError'
 import { getErrorMessage } from '../errors/utils'
 import logger from './logger'
 import { Variable } from '../database/entities/Variable'
-import { getWorkspaceSearchOptions } from '../enterprise/utils/ControllerServiceUtils'
+import { getWorkspaceSearchOptions } from '../identity'
 import { DataSource } from 'typeorm'
 import { CachePool } from '../CachePool'
 

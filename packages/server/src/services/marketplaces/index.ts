@@ -4,8 +4,7 @@ import path from 'path'
 import { DeleteResult } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { CustomTemplate } from '../../database/entities/CustomTemplate'
-import { WorkspaceService } from '../../enterprise/services/workspace.service'
-import { getWorkspaceSearchOptions } from '../../enterprise/utils/ControllerServiceUtils'
+import { getWorkspaceSearchOptions } from '../../identity'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { IReactFlowEdge, IReactFlowNode } from '../../Interface'
@@ -180,20 +179,6 @@ const getAllCustomTemplates = async (workspaceId?: string): Promise<any> => {
         const dbResponse = []
         _modifyTemplates(templates)
         dbResponse.push(...templates)
-        // get shared credentials
-        if (workspaceId) {
-            const workspaceService = new WorkspaceService()
-            const sharedItems = (await workspaceService.getSharedItemsForWorkspace(workspaceId, 'custom_template')) as CustomTemplate[]
-            if (sharedItems && sharedItems.length) {
-                _modifyTemplates(sharedItems)
-                // add shared = true flag to all shared items, to differentiate them in the UI
-                sharedItems.forEach((sharedItem) => {
-                    // @ts-ignore
-                    sharedItem.shared = true
-                    dbResponse.push(sharedItem)
-                })
-            }
-        }
         return dbResponse
     } catch (error) {
         throw new InternalFlowiseError(

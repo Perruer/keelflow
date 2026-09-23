@@ -52,7 +52,6 @@ jest.mock(
 jest.mock('../utils/telemetry', () => ({ Telemetry: class Telemetry {} }))
 jest.mock('../CachePool', () => ({ CachePool: class CachePool {} }))
 jest.mock('../UsageCacheManager', () => ({ UsageCacheManager: class UsageCacheManager {} }))
-jest.mock('../IdentityManager', () => ({ IdentityManager: class IdentityManager {} }))
 jest.mock('../utils/quotaUsage', () => ({
     checkPredictions: jest.fn(),
     updatePredictionsUsage: jest.fn()
@@ -122,8 +121,7 @@ beforeEach(() => {
         telemetry: {},
         cachePool: {},
         usageCacheManager: {},
-        sseStreamer: {},
-        identityManager: { getProductIdFromSubscription: jest.fn().mockResolvedValue('prod-1') }
+        sseStreamer: {}
     }
     ;(scheduleService.isScheduleInputValid as jest.Mock).mockReturnValue(true)
     ;(scheduleService.createTriggerLog as jest.Mock).mockResolvedValue({ id: 'log-1' })

@@ -1,6 +1,6 @@
 import express from 'express'
 import apikeyController from '../../controllers/apikey'
-import { checkAnyPermission, checkPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkAnyPermission, checkPermission } from '../../identity'
 const router = express.Router()
 
 // CREATE

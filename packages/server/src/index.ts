@@ -10,14 +10,8 @@ import { AbortControllerPool } from './AbortControllerPool'
 import { CachePool } from './CachePool'
 import { ChatFlow } from './database/entities/ChatFlow'
 import { getDataSource } from './DataSource'
-import { Organization } from './enterprise/database/entities/organization.entity'
-import { Workspace } from './enterprise/database/entities/workspace.entity'
-import { LoggedInUser } from './enterprise/Interface.Enterprise'
-import { initializeJwtCookieMiddleware, verifyToken, verifyTokenForBullMQDashboard } from './enterprise/middleware/passport'
-import { checkPermission } from './enterprise/rbac/PermissionCheck'
-import { initAuthSecrets } from './enterprise/utils/authSecrets'
-import { IdentityManager } from './IdentityManager'
-import { MODE, Platform } from './Interface'
+import { apiKeyUser, attachSession, LoggedInUser, purgeExpiredSessions, requireOwner, requireSession } from './identity'
+import { MODE } from './Interface'
 import { IMetricsProvider } from './Interface.Metrics'
 import { OpenTelemetry } from './metrics/OpenTelemetry'
 import { Prometheus } from './metrics/Prometheus'
@@ -70,7 +64,6 @@ export class App {
     rateLimiterManager: RateLimiterManager
     AppDataSource: DataSource = getDataSource()
     sseStreamer: SSEStreamer
-    identityManager: IdentityManager
     metricsProvider: IMetricsProvider
     queueManager: QueueManager
     redisSubscriber: RedisEventSubscriber
@@ -91,10 +84,6 @@ export class App {
             await this.AppDataSource.runMigrations({ transaction: 'each' })
             logger.info('🔄 [server]: Database migrations completed successfully')
 
-            // Initialize Identity Manager
-            this.identityManager = await IdentityManager.getInstance()
-            logger.info('🔐 [server]: Identity Manager initialized successfully')
-
             // Initialize nodes pool
             this.nodesPool = new NodesPool()
             await this.nodesPool.initialize()
@@ -108,9 +97,8 @@ export class App {
             await getEncryptionKey()
             logger.info('🔑 [server]: Encryption key initialized successfully')
 
-            // Initialize auth secrets (env → AWS Secrets Manager → filesystem)
-            await initAuthSecrets()
-            logger.info('🔐 [server]: Auth initialized successfully')
+            // Drop sign-in sessions that have expired
+            await purgeExpiredSessions(this.AppDataSource)
 
             // Initialize Rate Limit
             this.rateLimiterManager = RateLimiterManager.getInstance()
@@ -146,7 +134,6 @@ export class App {
                     appDataSource: this.AppDataSource,
                     abortControllerPool: this.abortControllerPool,
                     usageCacheManager: this.usageCacheManager,
-                    identityManager: this.identityManager,
                     serverAdapter
                 })
                 logger.info('✅ [Queue]: All queues setup successfully')
@@ -226,82 +213,32 @@ export class App {
         const URL_CASE_INSENSITIVE_REGEX: RegExp = /\/api\/v1\//i
         const URL_CASE_SENSITIVE_REGEX: RegExp = /\/api\/v1\//
 
-        await initializeJwtCookieMiddleware(this.app, this.identityManager)
-
         this.app.use(async (req, res, next) => {
-            // Step 1: Check if the req path contains /api/v1 regardless of case
-            if (URL_CASE_INSENSITIVE_REGEX.test(req.path)) {
-                // Step 2: Check if the req path is casesensitive
-                if (URL_CASE_SENSITIVE_REGEX.test(req.path)) {
-                    // Step 3: Check if the req path is in the whitelist
-                    const isWhitelisted = whitelistURLs.some((url) => req.path.startsWith(url))
-                    if (isWhitelisted) {
-                        next()
-                    } else if (req.headers['x-request-from'] === 'internal') {
-                        verifyToken(req, res, next)
-                    } else {
-                        const isAPIKeyBlacklistedURLS = API_KEY_BLACKLIST_URLS.some((url) => req.path.startsWith(url))
-                        if (isAPIKeyBlacklistedURLS) {
-                            return res.status(401).json({ error: 'Unauthorized Access' })
-                        }
+            // Paths outside /api/v1 (UI assets, /canvas, ...) are public
+            if (!URL_CASE_INSENSITIVE_REGEX.test(req.path)) return next()
+            // Reject case variations such as /API/V1 that could slip past the lists below
+            if (!URL_CASE_SENSITIVE_REGEX.test(req.path)) return res.status(401).json({ error: 'Unauthorized Access' })
 
-                        // Only check license validity for non-open-source platforms
-                        if (this.identityManager.getPlatformType() !== Platform.OPEN_SOURCE) {
-                            if (!this.identityManager.isLicenseValid()) {
-                                return res.status(401).json({ error: 'Unauthorized Access' })
-                            }
-                        }
+            try {
+                if (whitelistURLs.some((url) => req.path.startsWith(url))) return await attachSession(req, res, next)
 
-                        const { isValid, apiKey } = await validateAPIKey(req)
-                        if (!isValid || !apiKey) {
-                            return res.status(401).json({ error: 'Unauthorized Access' })
-                        }
+                // The web UI signs in with a session cookie
+                if (req.headers['x-request-from'] === 'internal') return await requireSession(req, res, next)
 
-                        // Find workspace
-                        const workspace = await this.AppDataSource.getRepository(Workspace).findOne({
-                            where: { id: apiKey.workspaceId }
-                        })
-                        if (!workspace) {
-                            return res.status(401).json({ error: 'Unauthorized Access' })
-                        }
-
-                        // Find organization
-                        const activeOrganizationId = workspace.organizationId as string
-                        const org = await this.AppDataSource.getRepository(Organization).findOne({
-                            where: { id: activeOrganizationId }
-                        })
-                        if (!org) {
-                            return res.status(401).json({ error: 'Unauthorized Access' })
-                        }
-                        const subscriptionId = org.subscriptionId as string
-                        const customerId = org.customerId as string
-                        const features = await this.identityManager.getFeaturesByPlan(subscriptionId)
-                        const productId = await this.identityManager.getProductIdFromSubscription(subscriptionId)
-                        // @ts-ignore
-                        req.user = {
-                            permissions: apiKey.permissions,
-                            features,
-                            activeOrganizationId: activeOrganizationId,
-                            activeOrganizationSubscriptionId: subscriptionId,
-                            activeOrganizationCustomerId: customerId,
-                            activeOrganizationProductId: productId,
-                            isOrganizationAdmin: false,
-                            activeWorkspaceId: workspace.id,
-                            activeWorkspace: workspace.name
-                        }
-                        next()
-                    }
-                } else {
+                // Everything else needs an API key, limited to what the key was granted
+                if (API_KEY_BLACKLIST_URLS.some((url) => req.path.startsWith(url))) {
                     return res.status(401).json({ error: 'Unauthorized Access' })
                 }
-            } else {
-                // If the req path does not contain /api/v1, then allow the request to pass through, example: /assets, /canvas
+                const { isValid, apiKey } = await validateAPIKey(req)
+                if (!isValid || !apiKey) return res.status(401).json({ error: 'Unauthorized Access' })
+                const user = await apiKeyUser(apiKey.workspaceId, apiKey.permissions)
+                if (!user) return res.status(401).json({ error: 'Unauthorized Access' })
+                req.user = user
                 next()
+            } catch (error) {
+                next(error)
             }
         })
-
-        // this is for SSO and must be after the JWT cookie middleware
-        await this.identityManager.initializeSSO(this.app)
 
         if (process.env.ENABLE_METRICS === 'true') {
             switch (process.env.METRICS_PROVIDER) {
@@ -337,7 +274,7 @@ export class App {
             })
         })
 
-        if (process.env.MODE === MODE.QUEUE && process.env.ENABLE_BULLMQ_DASHBOARD === 'true' && !this.identityManager.isCloud()) {
+        if (process.env.MODE === MODE.QUEUE && process.env.ENABLE_BULLMQ_DASHBOARD === 'true') {
             // Initialize admin queues rate limiter
             const id = 'bullmq_admin_dashboard'
             await this.rateLimiterManager.addRateLimiter(
@@ -348,13 +285,7 @@ export class App {
             )
 
             const rateLimiter = this.rateLimiterManager.getRateLimiterById(id)
-            this.app.use(
-                '/admin/queues',
-                rateLimiter,
-                verifyTokenForBullMQDashboard,
-                checkPermission('admin:queues'),
-                this.queueManager.getBullBoardRouter()
-            )
+            this.app.use('/admin/queues', rateLimiter, requireSession, requireOwner, this.queueManager.getBullBoardRouter())
         }
 
         // ----------------------------------------

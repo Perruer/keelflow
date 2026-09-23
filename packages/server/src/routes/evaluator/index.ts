@@ -1,6 +1,6 @@
 import express from 'express'
 import evaluatorsController from '../../controllers/evaluators'
-import { checkPermission, checkAnyPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkPermission, checkAnyPermission } from '../../identity'
 const router = express.Router()
 
 // get all datasets

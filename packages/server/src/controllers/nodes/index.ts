@@ -4,7 +4,7 @@ import nodesService from '../../services/nodes'
 import { ClientType, VALID_CLIENT_TYPES } from 'flowise-components'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { StatusCodes } from 'http-status-codes'
-import { getWorkspaceSearchOptionsFromReq } from '../../enterprise/utils/ControllerServiceUtils'
+import { getWorkspaceSearchOptionsFromReq } from '../../identity'
 
 // if req.query.client does not contain a valid client type, then return undefined so it won't filter the nodes unnecessarily
 const parseClientParam = (req: Request): ClientType | undefined => {

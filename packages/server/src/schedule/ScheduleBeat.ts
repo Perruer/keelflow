@@ -229,8 +229,7 @@ export class ScheduleBeat {
             telemetry: appServer.telemetry,
             cachePool: appServer.cachePool,
             usageCacheManager: appServer.usageCacheManager,
-            sseStreamer: appServer.sseStreamer,
-            identityManager: appServer.identityManager
+            sseStreamer: appServer.sseStreamer
         }
 
         await executeScheduleJob(ctx, scheduleRecordId, {

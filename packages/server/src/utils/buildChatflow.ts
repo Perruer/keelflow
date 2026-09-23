@@ -67,11 +67,11 @@ import { checkPredictions, checkStorage, updatePredictionsUsage, updateStorageUs
 import { buildAgentGraph } from './buildAgentGraph'
 import { getErrorMessage } from '../errors/utils'
 import { FLOWISE_METRIC_COUNTERS, FLOWISE_COUNTER_STATUS, IMetricsProvider } from '../Interface.Metrics'
-import { getWorkspaceSearchOptions } from '../enterprise/utils/ControllerServiceUtils'
+import { getWorkspaceSearchOptions } from '../identity'
 import { OMIT_QUEUE_JOB_DATA } from './constants'
 import { executeAgentFlow } from './buildAgentflow'
-import { Workspace } from '../enterprise/database/entities/workspace.entity'
-import { Organization } from '../enterprise/database/entities/organization.entity'
+import { Workspace } from '../database/entities/Workspace'
+import { Organization } from '../database/entities/Organization'
 
 const shouldAutoPlayTTS = (textToSpeechConfig: string | undefined | null): boolean => {
     if (!textToSpeechConfig) return false
@@ -1053,8 +1053,8 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
 
         const orgId = org.id
         organizationId = orgId
-        const subscriptionId = org.subscriptionId as string
-        const productId = await appServer.identityManager.getProductIdFromSubscription(subscriptionId)
+        const subscriptionId = ''
+        const productId = ''
 
         await checkPredictions(orgId, subscriptionId, appServer.usageCacheManager)
 

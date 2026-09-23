@@ -16,9 +16,9 @@ import { FLOWISE_COUNTER_STATUS, FLOWISE_METRIC_COUNTERS } from '../Interface.Me
 import { ChatFlow } from '../database/entities/ChatFlow'
 import { UpsertHistory } from '../database/entities/UpsertHistory'
 import { Variable } from '../database/entities/Variable'
-import { Organization } from '../enterprise/database/entities/organization.entity'
-import { Workspace } from '../enterprise/database/entities/workspace.entity'
-import { getWorkspaceSearchOptions } from '../enterprise/utils/ControllerServiceUtils'
+import { Organization } from '../database/entities/Organization'
+import { Workspace } from '../database/entities/Workspace'
+import { getWorkspaceSearchOptions } from '../identity'
 import { InternalFlowiseError } from '../errors/internalFlowiseError'
 import { getErrorMessage } from '../errors/utils'
 import {
@@ -281,8 +281,8 @@ export const upsertVector = async (req: Request, isInternal: boolean = false) =>
         }
 
         const orgId = org.id
-        const subscriptionId = org.subscriptionId as string
-        const productId = await appServer.identityManager.getProductIdFromSubscription(subscriptionId)
+        const subscriptionId = ''
+        const productId = ''
 
         const executeData: IExecuteFlowParams = {
             componentNodes: appServer.nodesPool.componentNodes,

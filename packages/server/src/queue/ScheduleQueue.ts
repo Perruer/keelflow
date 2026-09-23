@@ -10,7 +10,6 @@ import { CachePool } from '../CachePool'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { RedisEventPublisher } from './RedisEventPublisher'
 import { executeScheduleJob } from '../schedule/ScheduleExecutor'
-import { IdentityManager } from '../IdentityManager'
 
 interface ScheduleQueueOptions {
     appDataSource: DataSource
@@ -18,7 +17,6 @@ interface ScheduleQueueOptions {
     cachePool: CachePool
     componentNodes: IComponentNodes
     usageCacheManager: UsageCacheManager
-    identityManager: IdentityManager
 }
 
 interface ScheduleAgentflowJobData {
@@ -37,7 +35,6 @@ export class ScheduleQueue extends BaseQueue {
     private cachePool: CachePool
     private appDataSource: DataSource
     private usageCacheManager: UsageCacheManager
-    private identityManager: IdentityManager
     private redisPublisher: RedisEventPublisher
     private queueName: string
 
@@ -49,7 +46,6 @@ export class ScheduleQueue extends BaseQueue {
         this.cachePool = options.cachePool
         this.appDataSource = options.appDataSource
         this.usageCacheManager = options.usageCacheManager
-        this.identityManager = options.identityManager
         this.redisPublisher = new RedisEventPublisher() // sseStreamer for agentflow execution results
         this.redisPublisher.connect()
     }
@@ -77,8 +73,7 @@ export class ScheduleQueue extends BaseQueue {
             telemetry: this.telemetry,
             cachePool: this.cachePool,
             usageCacheManager: this.usageCacheManager,
-            sseStreamer: this.redisPublisher,
-            identityManager: this.identityManager
+            sseStreamer: this.redisPublisher
         }
 
         return executeScheduleJob(ctx, scheduleRecordId, {
