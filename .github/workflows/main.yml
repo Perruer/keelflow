@@ -172,10 +172,13 @@ jobs:
             - name: Start Keelflow on the Flowise data folder and check it
               working-directory: packages/server
               run: |
+                  # Build the Flowise database with a separate HOME: Flowise's own logger would
+                  # otherwise create folders in the home the upgrade is tested on.
+                  mkdir -p "$RUNNER_TEMP/builder-home" "$RUNNER_TEMP/home/.keelflow"
+                  HOME="$RUNNER_TEMP/builder-home" FLOWISE_PACKAGE_DIR="$RUNNER_TEMP/flowise/package" NODE_PATH="$PWD/node_modules" \
+                      node test/upgrade/make-flowise-db.cjs "$RUNNER_TEMP/home/.flowise" "$RUNNER_TEMP/flowise-db.json"
+                  # Keelflow must pick up ~/.flowise because ~/.keelflow is empty
                   export HOME="$RUNNER_TEMP/home"
-                  mkdir -p "$HOME/.keelflow"
-                  FLOWISE_PACKAGE_DIR="$RUNNER_TEMP/flowise/package" NODE_PATH="$PWD/node_modules" \
-                      node test/upgrade/make-flowise-db.cjs "$HOME/.flowise" "$RUNNER_TEMP/flowise-db.json"
                   PORT=3000 SERVER_LOG="$RUNNER_TEMP/server.log" \
                       bash test/run-with-server.sh node test/upgrade-check.mjs http://localhost:3000 "$RUNNER_TEMP/flowise-db.json"
 

@@ -3,6 +3,7 @@
 // Usage: FLOWISE_PACKAGE_DIR=<unpacked flowise-3.1.4.tgz>/package NODE_PATH=packages/server/node_modules
 //        node make-flowise-db.cjs <dbDir> <out.json>
 // The owner is owner@flowise.test / Flowise-owner-1!; out.json receives the API key and flow name.
+// Run it with a HOME other than the one Keelflow will use: Flowise's logger creates folders there.
 /* eslint-disable no-console */
 const path = require('path')
 const fs = require('fs')
