@@ -46,7 +46,8 @@ const getChatflowStats = async (req: Request, res: Response, next: NextFunction)
                     feedbackTypeFilters = undefined
                 }
             } catch (e) {
-                return res.status(500).send(e)
+                // do not echo the parser error (and its stack) back to the client
+                return res.status(400).json({ message: 'Invalid feedbackType filter' })
             }
         }
         const apiResponse = await statsService.getChatflowStats(
