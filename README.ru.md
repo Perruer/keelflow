@@ -66,7 +66,7 @@ pnpm start
 1. Остановите Flowise и сделайте копию папки с данными (`~/.flowise`) или базы.
 2. Запустите Keelflow на тех же данных:
     - **Docker:** замените образ `flowiseai/flowise` на `ghcr.io/perruer/keelflow`, тома и переменные окружения оставьте. Том, подключённый в `/home/node/.flowise`, подхватится сам.
-    - **Из исходников или через npm:** Keelflow использует `~/.flowise`, пока нет `~/.keelflow`. `DATABASE_*`, `SECRETKEY_PATH`, `FLOWISE_SECRETKEY_OVERWRITE` и прочие переменные `FLOWISE_*` называются так же.
+    - **Из исходников:** Keelflow использует `~/.flowise`, пока `~/.keelflow` нет или она пуста. `DATABASE_*`, `SECRETKEY_PATH`, `FLOWISE_SECRETKEY_OVERWRITE` и прочие переменные `FLOWISE_*` называются так же.
 3. Войдите с почтой и паролем владельца из Flowise. Учётные данные расшифруются, если ключ шифрования тот же.
 
 Что не переносится: учётные записи других пользователей (из Flowise Enterprise), SSO, приглашения, роли и переключение между несколькими пространствами. API-ключи продолжают работать с прежними правами. Если в базе от Flowise Enterprise несколько пространств, нужное задаётся через `KEELFLOW_WORKSPACE_ID`.

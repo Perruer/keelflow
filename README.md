@@ -66,7 +66,7 @@ pnpm start
 1. Stop Flowise and back up its data folder (`~/.flowise`) or database.
 2. Start Keelflow on the same data:
     - **Docker:** replace the image `flowiseai/flowise` with `ghcr.io/perruer/keelflow` and keep your volumes and environment variables. A volume mounted at `/home/node/.flowise` is picked up automatically.
-    - **Source or npm install:** Keelflow uses `~/.flowise` as long as `~/.keelflow` does not exist. `DATABASE_*`, `SECRETKEY_PATH`, `FLOWISE_SECRETKEY_OVERWRITE` and the other `FLOWISE_*` variables keep their names.
+    - **From source:** Keelflow uses `~/.flowise` as long as `~/.keelflow` is missing or empty. `DATABASE_*`, `SECRETKEY_PATH`, `FLOWISE_SECRETKEY_OVERWRITE` and the other `FLOWISE_*` variables keep their names.
 3. Sign in with the owner's email and password from Flowise. Credentials stay readable as long as the encryption key is the same.
 
 What does not carry over: other user accounts (from Flowise Enterprise), SSO, invitations, roles and switching between several workspaces. API keys keep working with the permissions they had. If a database from Flowise Enterprise has several workspaces, choose the one to use with `KEELFLOW_WORKSPACE_ID`.
