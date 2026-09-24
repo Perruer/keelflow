@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.2.0 — Unreleased
+## 3.2.0 — 2026-09-24
 
 First Keelflow release, based on Flowise 3.1.4 (the last Flowise release, July 29, 2026). Databases, flows, credentials and API keys from Flowise 3.x work without changes.
 
