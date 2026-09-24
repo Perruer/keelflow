@@ -1,53 +1,198 @@
-name: Node CI
+name: CI
+
 on:
     push:
-        branches:
-            - main
+        branches: [main]
     pull_request:
-        branches:
-            - '*'
     workflow_dispatch:
+
 permissions:
     contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    PUPPETEER_SKIP_DOWNLOAD: 'true'
+    CYPRESS_INSTALL_BINARY: '0'
+    HUSKY: '0'
+    TURBO_TELEMETRY_DISABLED: '1'
+
 jobs:
     build:
-        strategy:
-            matrix:
-                platform: [ubuntu-latest]
-                node-version: [24.15.0]
-        runs-on: ${{ matrix.platform }}
-        env:
-            PUPPETEER_SKIP_DOWNLOAD: true
+        name: Lint, build and unit tests
+        runs-on: ubuntu-latest
+        timeout-minutes: 60
         steps:
             - uses: actions/checkout@v6
             - uses: pnpm/action-setup@v4
               with:
                   version: 10.26.0
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v6
+            - uses: actions/setup-node@v6
               with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: 'pnpm'
-                  cache-dependency-path: 'pnpm-lock.yaml'
-            - run: pnpm install
+                  node-version: 24
+                  cache: pnpm
+                  cache-dependency-path: pnpm-lock.yaml
+            - run: pnpm install --frozen-lockfile
             - run: pnpm lint
             - run: pnpm build
               env:
-                  NODE_OPTIONS: '--max_old_space_size=4096'
-            - run: pnpm test:coverage
-            - name: Cypress install
-              run: pnpm cypress install
-            - name: Install dependencies (Cypress Action)
-              uses: cypress-io/github-action@v7.1.5
+                  NODE_OPTIONS: --max-old-space-size=6144
+            - run: pnpm test
+            - uses: actions/upload-artifact@v7
               with:
-                  working-directory: ./
-                  runTests: false
-            - name: Cypress test
-              uses: cypress-io/github-action@v7.1.5
+                  name: build
+                  retention-days: 3
+                  path: |
+                      packages/components/dist
+                      packages/server/dist
+                      packages/ui/build
+
+    e2e-sqlite:
+        name: Sign-in and API keys (SQLite)
+        needs: build
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/e2e
               with:
-                  install: false
-                  working-directory: packages/server
-                  start: pnpm start
-                  wait-on: 'http://localhost:3000'
-                  wait-on-timeout: 120
-                  browser: chrome
+                  command: node test/auth-flow.mjs http://localhost:3000
+
+    e2e-postgres:
+        name: Sign-in and API keys (Postgres)
+        needs: build
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        services:
+            postgres:
+                image: postgres:17
+                env:
+                    POSTGRES_USER: keelflow
+                    POSTGRES_PASSWORD: keelflow
+                    POSTGRES_DB: keelflow
+                ports: ['5432:5432']
+                options: --health-cmd "pg_isready -U keelflow" --health-interval 5s --health-timeout 5s --health-retries 20
+        env:
+            DATABASE_TYPE: postgres
+            DATABASE_HOST: localhost
+            DATABASE_PORT: '5432'
+            DATABASE_USER: keelflow
+            DATABASE_PASSWORD: keelflow
+            DATABASE_NAME: keelflow
+        steps:
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/e2e
+              with:
+                  command: node test/auth-flow.mjs http://localhost:3000
+
+    e2e-mysql:
+        name: Sign-in and API keys (MySQL)
+        needs: build
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        services:
+            mysql:
+                image: mysql:8.4
+                env:
+                    MYSQL_ROOT_PASSWORD: keelflow
+                    MYSQL_DATABASE: keelflow
+                    MYSQL_USER: keelflow
+                    MYSQL_PASSWORD: keelflow
+                ports: ['3306:3306']
+                options: --health-cmd "mysqladmin ping -h 127.0.0.1 -pkeelflow" --health-interval 5s --health-timeout 5s --health-retries 30
+        env:
+            DATABASE_TYPE: mysql
+            DATABASE_HOST: 127.0.0.1
+            DATABASE_PORT: '3306'
+            DATABASE_USER: keelflow
+            DATABASE_PASSWORD: keelflow
+            DATABASE_NAME: keelflow
+        steps:
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/e2e
+              with:
+                  command: node test/auth-flow.mjs http://localhost:3000
+
+    e2e-mariadb:
+        name: Sign-in and API keys (MariaDB)
+        needs: build
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        services:
+            mariadb:
+                image: mariadb:11.4
+                env:
+                    MARIADB_ROOT_PASSWORD: keelflow
+                    MARIADB_DATABASE: keelflow
+                    MARIADB_USER: keelflow
+                    MARIADB_PASSWORD: keelflow
+                ports: ['3306:3306']
+                options: --health-cmd "healthcheck.sh --connect --innodb_initialized" --health-interval 5s --health-timeout 5s --health-retries 30
+        env:
+            DATABASE_TYPE: mariadb
+            DATABASE_HOST: 127.0.0.1
+            DATABASE_PORT: '3306'
+            DATABASE_USER: keelflow
+            DATABASE_PASSWORD: keelflow
+            DATABASE_NAME: keelflow
+        steps:
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/e2e
+              with:
+                  command: node test/auth-flow.mjs http://localhost:3000
+
+    upgrade-from-flowise:
+        name: Upgrade from Flowise 3.1.4 (SQLite)
+        needs: build
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - uses: actions/checkout@v6
+            - name: Fetch flowise@3.1.4 and build a database with its migrations
+              run: |
+                  mkdir -p "$RUNNER_TEMP/flowise"
+                  cd "$RUNNER_TEMP/flowise"
+                  npm pack flowise@3.1.4 --silent
+                  tar xzf flowise-3.1.4.tgz
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 10.26.0
+            - uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+                  cache-dependency-path: pnpm-lock.yaml
+            - run: pnpm install --frozen-lockfile
+            - uses: actions/download-artifact@v8
+              with:
+                  name: build
+                  path: packages
+            - name: Start Keelflow on the Flowise data folder and check it
+              working-directory: packages/server
+              run: |
+                  export HOME="$RUNNER_TEMP/home"
+                  mkdir -p "$HOME/.keelflow"
+                  FLOWISE_PACKAGE_DIR="$RUNNER_TEMP/flowise/package" NODE_PATH="$PWD/node_modules" \
+                      node test/upgrade/make-flowise-db.cjs "$HOME/.flowise" "$RUNNER_TEMP/flowise-db.json"
+                  PORT=3000 SERVER_LOG="$RUNNER_TEMP/server.log" \
+                      bash test/run-with-server.sh node test/upgrade-check.mjs http://localhost:3000 "$RUNNER_TEMP/flowise-db.json"
+
+    docker:
+        name: Docker image builds and starts
+        if: github.event_name != 'pull_request'
+        runs-on: ubuntu-latest
+        timeout-minutes: 60
+        steps:
+            - uses: actions/checkout@v6
+            - run: docker build -t keelflow:ci .
+            - name: Start the image and wait for the API
+              run: |
+                  docker run -d --name keelflow -p 3000:3000 keelflow:ci
+                  for i in $(seq 1 90); do
+                      if curl -fs http://localhost:3000/api/v1/ping; then echo; exit 0; fi
+                      sleep 2
+                  done
+                  docker logs keelflow
+                  exit 1

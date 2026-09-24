@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // End-to-end check of Keelflow's owner account, sessions and API keys against a running server.
 // Usage: node test/auth-flow.mjs [baseUrl]   (use a fresh database: it registers the owner)
 import assert from 'node:assert/strict'

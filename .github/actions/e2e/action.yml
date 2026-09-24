@@ -1,0 +1,33 @@
+name: Keelflow end-to-end check
+description: Installs dependencies, restores the build from the build job, starts the server and runs a test script against it.
+inputs:
+    command:
+        description: Test command, run from packages/server while the server listens on port 3000
+        required: true
+runs:
+    using: composite
+    steps:
+        - uses: pnpm/action-setup@v4
+          with:
+              version: 10.26.0
+        - uses: actions/setup-node@v6
+          with:
+              node-version: 24
+              cache: pnpm
+              cache-dependency-path: pnpm-lock.yaml
+        - shell: bash
+          run: pnpm install --frozen-lockfile
+          env:
+              PUPPETEER_SKIP_DOWNLOAD: 'true'
+              CYPRESS_INSTALL_BINARY: '0'
+              HUSKY: '0'
+        - uses: actions/download-artifact@v8
+          with:
+              name: build
+              path: packages
+        - shell: bash
+          working-directory: packages/server
+          run: |
+              mkdir -p "$RUNNER_TEMP/keelflow-home"
+              export KEELFLOW_HOME="$RUNNER_TEMP/keelflow-home" PORT=3000
+              SERVER_LOG="$RUNNER_TEMP/server.log" bash test/run-with-server.sh ${{ inputs.command }}

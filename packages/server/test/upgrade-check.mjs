@@ -1,9 +1,15 @@
+/* eslint-disable no-console */
 // Checks that a database created by Flowise 3.x works in Keelflow without changes:
 // the existing owner signs in with the old password, sees the old flows, and old API keys keep their limits.
-// Usage: node test/upgrade-check.mjs <baseUrl> <ownerEmail> <ownerPassword> <apiKey> <flowName>
+// Usage: node test/upgrade-check.mjs <baseUrl> <result.json from make-flowise-db.cjs>
+//    or: node test/upgrade-check.mjs <baseUrl> <ownerEmail> <ownerPassword> <apiKey> <flowName>
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 
-const [base, email, password, apiKey, flowName] = process.argv.slice(2)
+const args = process.argv.slice(2)
+const fromFile = args[1]?.endsWith('.json') ? JSON.parse(readFileSync(args[1], 'utf8')) : undefined
+const base = args[0]
+const { email, password, apiKey, flowName } = fromFile ?? { email: args[1], password: args[2], apiKey: args[3], flowName: args[4] }
 let cookie = ''
 
 const call = async (method, path, { body, auth, internal = true } = {}) => {
