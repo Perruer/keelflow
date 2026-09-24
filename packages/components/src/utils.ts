@@ -660,8 +660,10 @@ export const getCredentialData = async (selectedCredentialId: string, options: I
             return {}
         }
 
+        // A flow may only use credentials from its own workspace (GHSA-27w2-26m5-x82c)
         const credential = await appDataSource.getRepository(databaseEntities['Credential']).findOneBy({
-            id: selectedCredentialId
+            id: selectedCredentialId,
+            ...(options.workspaceId ? { workspaceId: options.workspaceId } : {})
         })
 
         if (!credential) return {}
