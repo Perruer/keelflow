@@ -1,7 +1,20 @@
 {
-    "name": "flowise-api",
-    "version": "1.0.3",
-    "description": "Flowise API documentation server",
+    "name": "keelflow-api-docs",
+    "version": "3.2.0",
+    "description": "Keelflow API documentation server",
+    "homepage": "https://github.com/Perruer/keelflow",
+    "license": "Apache-2.0",
+    "author": {
+        "name": "Perruer",
+        "url": "https://github.com/Perruer"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Perruer/keelflow.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Perruer/keelflow/issues"
+    },
     "scripts": {
         "build": "tsc",
         "start": "node dist/index.js",
@@ -9,7 +22,6 @@
         "nuke": "pnpm clean && rimraf node_modules .turbo",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
     },
-    "license": "SEE LICENSE IN LICENSE.md",
     "dependencies": {
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.0"

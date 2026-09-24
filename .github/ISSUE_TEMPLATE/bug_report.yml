@@ -56,19 +56,18 @@ body:
       id: method
       attributes:
           label: Use Method
-          description: How did you use Flowise?
+          description: How do you run Keelflow?
           options:
-              - Flowise Cloud
               - Docker
-              - npx flowise start
-              - pnpm start
+              - pnpm start (from source)
+              - Other
 
     - type: input
       id: version
       attributes:
-          label: Flowise Version
-          description: What version of Flowise are you running?
-          placeholder: e.g., 1.2.11
+          label: Keelflow Version
+          description: What version of Keelflow are you running?
+          placeholder: e.g., 3.2.0
 
     - type: dropdown
       id: os

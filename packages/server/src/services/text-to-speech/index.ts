@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
-import { getVoices } from 'flowise-components'
+import { getVoices } from 'keelflow-components'
 import { databaseEntities } from '../../utils'
 import credentialsService from '../credentials'
 

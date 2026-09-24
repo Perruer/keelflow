@@ -9,7 +9,7 @@ jest.mock('fs', () => ({
     mkdirSync: (...args: any[]) => mockMkdirSync(...args)
 }))
 
-jest.mock('flowise-components', () => {
+jest.mock('keelflow-components', () => {
     const winston = require('winston')
     return {
         StorageProviderFactory: {

@@ -5,7 +5,7 @@ import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { decryptCredentialData } from '../../utils'
-import { getFileFromUpload, removeSpecificFileFromUpload } from 'flowise-components'
+import { getFileFromUpload, removeSpecificFileFromUpload } from 'keelflow-components'
 
 const rethrowIfFlowiseError = (error: unknown): void => {
     if (error instanceof InternalFlowiseError) {

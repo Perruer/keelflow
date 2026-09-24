@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { convertTextToSpeechStream } from 'flowise-components'
+import { convertTextToSpeechStream } from 'keelflow-components'
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import chatflowsService from '../../services/chatflows'

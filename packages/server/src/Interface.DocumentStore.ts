@@ -1,4 +1,4 @@
-import { ICommonObject } from 'flowise-components'
+import { ICommonObject } from 'keelflow-components'
 import { DocumentStore } from './database/entities/DocumentStore'
 import { DataSource } from 'typeorm'
 import { IComponentNodes } from './Interface'

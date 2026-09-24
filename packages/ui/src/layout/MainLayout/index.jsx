@@ -14,7 +14,7 @@ import { drawerWidth, headerHeight } from '@/store/constant'
 import { SET_MENU } from '@/store/actions'
 
 const BANNER_HEIGHT = 45
-const BANNER_DISMISSED_KEY = 'flowise.announcementDismissed'
+const BANNER_DISMISSED_KEY = 'keelflow.announcementDismissed'
 
 // styles
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' && prop !== 'bannerOffset' })(

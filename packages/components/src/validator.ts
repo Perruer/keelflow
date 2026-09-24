@@ -1,6 +1,6 @@
 import path from 'path'
 import sanitize from 'sanitize-filename'
-import { getUserHome, isAllowedUploadMimeType, mapMimeTypeToExt } from './utils'
+import { getDataDir, isAllowedUploadMimeType, mapMimeTypeToExt } from './utils'
 
 /**
  * Validates if a string is a valid UUID v4
@@ -187,9 +187,8 @@ export const filterAllowedUploadMimeTypes = (mimeTypes: string[]): string[] => {
 const getAllowedVectorStoreBaseDirs = (): string[] => {
     const allowedDirs: string[] = []
 
-    // Allow user home .flowise directory
-    const userHome = getUserHome()
-    allowedDirs.push(path.join(userHome, '.flowise'))
+    // Allow the data directory (~/.keelflow, or ~/.flowise for installations moved from Flowise)
+    allowedDirs.push(getDataDir())
 
     // Allow configured blob storage path if set
     if (process.env.BLOB_STORAGE_PATH) {
@@ -212,15 +211,15 @@ const getAllowedVectorStoreBaseDirs = (): string[] => {
 export const validateVectorStorePath = (userProvidedPath: string | undefined): string => {
     if (process.env.PATH_TRAVERSAL_SAFETY === 'false') {
         if (!userProvidedPath || userProvidedPath.trim() === '') {
-            return path.join(getUserHome(), '.flowise', 'vectorstore')
+            return path.join(getDataDir(), 'vectorstore')
         }
         const bypassPath = userProvidedPath.trim()
-        return path.isAbsolute(bypassPath) ? bypassPath : path.resolve(path.join(getUserHome(), '.flowise', bypassPath))
+        return path.isAbsolute(bypassPath) ? bypassPath : path.resolve(path.join(getDataDir(), bypassPath))
     }
 
     // If no path provided, use default secure location
     if (!userProvidedPath || userProvidedPath.trim() === '') {
-        return path.join(getUserHome(), '.flowise', 'vectorstore')
+        return path.join(getDataDir(), 'vectorstore')
     }
 
     const basePath = userProvidedPath.trim()
@@ -260,7 +259,7 @@ export const validateVectorStorePath = (userProvidedPath: string | undefined): s
         resolvedPath = path.resolve(basePath)
     } else {
         // Relative paths are resolved within the .flowise directory for safety
-        resolvedPath = path.resolve(path.join(getUserHome(), '.flowise', basePath))
+        resolvedPath = path.resolve(path.join(getDataDir(), basePath))
     }
 
     // Verify the resolved path doesn't contain '..' after resolution
@@ -286,7 +285,7 @@ export const validateVectorStorePath = (userProvidedPath: string | undefined): s
 }
 
 const getAllowedSQLiteBaseDirs = (): string[] => {
-    const dirs = [path.join(getUserHome(), '.flowise')]
+    const dirs = [getDataDir()]
     if (process.env.DATABASE_PATH) {
         dirs.push(path.resolve(process.env.DATABASE_PATH))
     }

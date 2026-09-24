@@ -7,5 +7,10 @@
     "access": "public",
     "baseBranch": "main",
     "updateInternalDependencies": "patch",
-    "ignore": ["flowise", "flowise-api", "flowise-components", "flowise-ui"]
+    "ignore": [
+        "keelflow",
+        "keelflow-api-docs",
+        "keelflow-components",
+        "keelflow-ui"
+    ]
 }

@@ -1,5 +1,5 @@
 import { randomBytes } from 'crypto'
-import { ICommonObject, removeFolderFromStorage } from 'flowise-components'
+import { ICommonObject, removeFolderFromStorage } from 'keelflow-components'
 import { StatusCodes } from 'http-status-codes'
 import { Brackets, In, QueryRunner } from 'typeorm'
 import { validate as isValidUUID } from 'uuid'

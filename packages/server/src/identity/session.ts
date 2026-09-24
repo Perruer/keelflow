@@ -23,7 +23,7 @@ const hashToken = (token: string) => createHash('sha256').update(token).digest('
 
 const repo = () => getRunningExpressApp().AppDataSource.getRepository(AuthSession)
 
-const useSecureCookies = (req: Request): boolean => {
+const secureCookiesFor = (req: Request): boolean => {
     const setting = process.env.SECURE_COOKIES
     if (setting === 'true') return true
     if (setting === 'false') return false
@@ -34,14 +34,14 @@ const setCookie = (req: Request, res: Response, token: string, expiresAt: Date) 
     res.cookie(SESSION_COOKIE, token, {
         httpOnly: true,
         sameSite: 'lax',
-        secure: useSecureCookies(req),
+        secure: secureCookiesFor(req),
         path: '/',
         expires: expiresAt
     })
 }
 
 export const clearSessionCookie = (req: Request, res: Response) => {
-    res.clearCookie(SESSION_COOKIE, { httpOnly: true, sameSite: 'lax', secure: useSecureCookies(req), path: '/' })
+    res.clearCookie(SESSION_COOKIE, { httpOnly: true, sameSite: 'lax', secure: secureCookiesFor(req), path: '/' })
 }
 
 export const startSession = async (req: Request, res: Response, userId: string): Promise<void> => {

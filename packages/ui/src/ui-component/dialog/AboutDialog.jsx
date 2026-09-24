@@ -13,7 +13,7 @@ const AboutDialog = ({ show, onCancel }) => {
 
     useEffect(() => {
         if (show) {
-            const latestReleaseReq = axios.get('https://api.github.com/repos/FlowiseAI/Flowise/releases/latest')
+            const latestReleaseReq = axios.get('https://api.github.com/repos/Perruer/keelflow/releases/latest')
             const currentVersionReq = axios.get(`${baseURL}/api/v1/version`, {
                 withCredentials: true,
                 headers: { 'Content-type': 'application/json', 'x-request-from': 'internal' }
@@ -45,7 +45,7 @@ const AboutDialog = ({ show, onCancel }) => {
             aria-describedby='alert-dialog-description'
         >
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
-                Flowise Version
+                Keelflow Version
             </DialogTitle>
             <DialogContent>
                 {data && (

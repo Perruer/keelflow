@@ -1,5 +1,5 @@
 import path from 'path'
-import { getBaseClasses, getCredentialData, getCredentialParam, getUserHome } from '../../../src/utils'
+import { getBaseClasses, getCredentialData, getCredentialParam, getDataDir } from '../../../src/utils'
 import { validateSQLitePath } from '../../../src/validator'
 import { SaverOptions } from './interface'
 import { ICommonObject, IDatabaseEntity, INode, INodeData, INodeParams } from '../../../src/Interface'
@@ -135,7 +135,7 @@ class AgentMemory_Memory implements INode {
         if (databaseType === 'sqlite') {
             datasourceOptions.database = databaseFilePath
                 ? validateSQLitePath(databaseFilePath)
-                : path.join(process.env.DATABASE_PATH ?? path.join(getUserHome(), '.flowise'), 'database.sqlite')
+                : path.join(process.env.DATABASE_PATH ?? getDataDir(), 'database.sqlite')
             const args: SaverOptions = {
                 datasourceOptions,
                 threadId,

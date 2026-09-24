@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import _ from 'lodash'
 import nodesService from '../../services/nodes'
-import { ClientType, VALID_CLIENT_TYPES } from 'flowise-components'
+import { ClientType, VALID_CLIENT_TYPES } from 'keelflow-components'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { StatusCodes } from 'http-status-codes'
 import { getWorkspaceSearchOptionsFromReq } from '../../identity'

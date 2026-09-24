@@ -6,7 +6,7 @@ import {
     mapExtToInputField,
     mapMimeTypeToInputField,
     removeSpecificFileFromUpload
-} from 'flowise-components'
+} from 'keelflow-components'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep, omit } from 'lodash'
 import * as path from 'path'

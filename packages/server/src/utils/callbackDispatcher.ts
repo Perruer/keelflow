@@ -1,5 +1,5 @@
 import { createHmac } from 'crypto'
-import { secureAxiosRequest } from 'flowise-components'
+import { secureAxiosRequest } from 'keelflow-components'
 import logger from './logger'
 
 // Delays in ms before each attempt: attempt 1 is immediate, attempt 2 waits 3s, attempt 3 waits 6s

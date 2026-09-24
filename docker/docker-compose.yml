@@ -1,8 +1,8 @@
 version: '3.1'
 
 services:
-    flowise:
-        image: flowiseai/flowise:latest
+    keelflow:
+        image: ghcr.io/perruer/keelflow:latest
         restart: always
         environment:
             - PORT=${PORT}
@@ -72,35 +72,15 @@ services:
             - MODEL_LIST_CONFIG_JSON=${MODEL_LIST_CONFIG_JSON}
 
             # AUTH PARAMETERS
+            - SESSION_EXPIRY_IN_MINUTES=${SESSION_EXPIRY_IN_MINUTES}
+            - SESSION_MAX_AGE_IN_MINUTES=${SESSION_MAX_AGE_IN_MINUTES}
+            - TRUST_PROXY=${TRUST_PROXY}
+            - KEELFLOW_HOME=${KEELFLOW_HOME}
+            - KEELFLOW_WORKSPACE_ID=${KEELFLOW_WORKSPACE_ID}
             - APP_URL=${APP_URL}
-            - JWT_AUTH_TOKEN_SECRET=${JWT_AUTH_TOKEN_SECRET}
-            - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}
-            - JWT_ISSUER=${JWT_ISSUER}
-            - JWT_AUDIENCE=${JWT_AUDIENCE}
-            - JWT_TOKEN_EXPIRY_IN_MINUTES=${JWT_TOKEN_EXPIRY_IN_MINUTES}
-            - JWT_REFRESH_TOKEN_EXPIRY_IN_MINUTES=${JWT_REFRESH_TOKEN_EXPIRY_IN_MINUTES}
-            - EXPIRE_AUTH_TOKENS_ON_RESTART=${EXPIRE_AUTH_TOKENS_ON_RESTART}
-            - EXPRESS_SESSION_SECRET=${EXPRESS_SESSION_SECRET}
-            - PASSWORD_RESET_TOKEN_EXPIRY_IN_MINS=${PASSWORD_RESET_TOKEN_EXPIRY_IN_MINS}
             - PASSWORD_SALT_HASH_ROUNDS=${PASSWORD_SALT_HASH_ROUNDS}
-            - TOKEN_HASH_SECRET=${TOKEN_HASH_SECRET}
             - SECURE_COOKIES=${SECURE_COOKIES}
 
-            # EMAIL
-            - SMTP_HOST=${SMTP_HOST}
-            - SMTP_PORT=${SMTP_PORT}
-            - SMTP_USER=${SMTP_USER}
-            - SMTP_PASSWORD=${SMTP_PASSWORD}
-            - SMTP_SECURE=${SMTP_SECURE}
-            - ALLOW_UNAUTHORIZED_CERTS=${ALLOW_UNAUTHORIZED_CERTS}
-            - SENDER_EMAIL=${SENDER_EMAIL}
-
-            # ENTERPRISE
-            - LICENSE_URL=${LICENSE_URL}
-            - FLOWISE_EE_LICENSE_KEY=${FLOWISE_EE_LICENSE_KEY}
-            - OFFLINE=${OFFLINE}
-            - INVITE_TOKEN_EXPIRY_IN_HOURS=${INVITE_TOKEN_EXPIRY_IN_HOURS}
-            - WORKSPACE_INVITE_TEMPLATE_PATH=${WORKSPACE_INVITE_TEMPLATE_PATH}
 
             # METRICS COLLECTION
             - POSTHOG_PUBLIC_API_KEY=${POSTHOG_PUBLIC_API_KEY}
@@ -161,6 +141,5 @@ services:
             start_period: 30s
         volumes:
             # Container now runs as the non-root `node` user, whose home is /home/node.
-            # Ensure the host directory is writable by that user (e.g. `chown -R 1000:1000 ~/.flowise` on Linux hosts).
-            - ~/.flowise:/home/node/.flowise
-        entrypoint: /bin/sh -c "sleep 3; flowise start"
+            # Ensure the host directory is writable by that user (e.g. `chown -R 1000:1000 ~/.keelflow` on Linux hosts).
+            - ~/.keelflow:/home/node/.keelflow

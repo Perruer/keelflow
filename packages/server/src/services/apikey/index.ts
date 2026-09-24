@@ -4,11 +4,9 @@ import { ApiKey } from '../../database/entities/ApiKey'
 import { LoggedInUser } from '../../identity'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
-import { Platform } from '../../Interface'
 import { addChatflowsCount } from '../../utils/addChatflowsCount'
 import { generateAPIKey, generateSecretHash } from '../../utils/apiKey'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
-import logger from '../../utils/logger'
 
 /**
  * Validates that requested permissions are allowed for API keys

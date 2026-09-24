@@ -560,7 +560,7 @@ const getEncryptionKeyFilePath = (): string => {
         path.join(__dirname, '..', '..', '..', '..', 'server', 'encryption.key'),
         path.join(__dirname, '..', '..', '..', '..', '..', 'encryption.key'),
         path.join(__dirname, '..', '..', '..', '..', '..', 'server', 'encryption.key'),
-        path.join(getUserHome(), '.flowise', 'encryption.key')
+        path.join(getDataDir(), 'encryption.key')
     ]
     for (const checkPath of checkPaths) {
         if (fs.existsSync(checkPath)) {
@@ -741,6 +741,20 @@ export const getUserHome = (): string => {
         return process.cwd()
     }
     return process.env[variableName] as string
+}
+
+/**
+ * Folder for the database, keys, uploads and logs when no explicit path is configured:
+ * KEELFLOW_HOME if set, otherwise ~/.keelflow. An existing ~/.flowise is used while
+ * ~/.keelflow is missing or empty, so a Flowise installation keeps its data.
+ */
+export const getDataDir = (): string => {
+    if (process.env.KEELFLOW_HOME) return process.env.KEELFLOW_HOME
+    const keelflowDir = path.join(getUserHome(), '.keelflow')
+    const flowiseDir = path.join(getUserHome(), '.flowise')
+    const isEmpty = (dir: string) => !fs.existsSync(dir) || fs.readdirSync(dir).length === 0
+    if (isEmpty(keelflowDir) && !isEmpty(flowiseDir)) return flowiseDir
+    return keelflowDir
 }
 
 /**

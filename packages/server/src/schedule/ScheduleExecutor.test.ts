@@ -35,7 +35,7 @@ jest.mock('../utils/logger', () => ({
     __esModule: true,
     default: { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() }
 }))
-jest.mock('flowise-components', () => ({}), { virtual: true })
+jest.mock('keelflow-components', () => ({}), { virtual: true })
 jest.mock(
     '../Interface',
     () => ({

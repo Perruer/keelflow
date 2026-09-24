@@ -1,53 +1,49 @@
-# Flowise Docker Hub Image
+# Keelflow with Docker
 
-Starts Flowise from [DockerHub Image](https://hub.docker.com/r/flowiseai/flowise)
+The image `ghcr.io/perruer/keelflow` is built from the [Dockerfile](../Dockerfile) in the repository root for `linux/amd64` and `linux/arm64`. It runs as the non-root `node` user (uid 1000).
 
-## Usage
+## Single container
 
-1. Create `.env` file and specify the `PORT` (refer to `.env.example`)
+```bash
+docker run -d --name keelflow -p 3000:3000 -v ~/.keelflow:/home/node/.keelflow ghcr.io/perruer/keelflow:latest
+```
+
+Or with compose:
+
+1. Copy `.env.example` to `.env` and adjust it.
 2. `docker compose up -d`
-3. Open [http://localhost:3000](http://localhost:3000)
-4. You can bring the containers down by `docker compose stop`
+3. Open http://localhost:3000 and create the owner account.
 
-## 🌱 Env Variables
+If you bind-mount a host folder, it must be writable by uid 1000: `chown -R 1000:1000 ~/.keelflow` on Linux.
 
-If you like to persist your data (flows, logs, credentials, storage), set these variables in the `.env` file inside `docker` folder:
+## Coming from the Flowise image
 
--   DATABASE_PATH=/home/node/.flowise
--   LOG_PATH=/home/node/.flowise/logs
--   SECRETKEY_PATH=/home/node/.flowise
--   BLOB_STORAGE_PATH=/home/node/.flowise/storage
+Keep your volume and environment and change only the image:
 
-Flowise also support different environment variables to configure your instance. Read [more](https://docs.flowiseai.com/configuration/environment-variables)
-
-> The container runs as the non-root `node` user (uid 1000), whose home directory is `/home/node`. If you bind-mount a host directory (e.g. `~/.flowise`) for persistence, make sure it's writable by that user - on Linux hosts this may require `chown -R 1000:1000 ~/.flowise`.
-
-## Queue Mode:
-
-### Building from source:
-
-You can build the images for worker and main from scratch with:
-
-```
-docker compose -f docker-compose-queue-source.yml up -d
+```bash
+docker run -d --name keelflow -p 3000:3000 -v ~/.flowise:/home/node/.flowise ghcr.io/perruer/keelflow:latest
 ```
 
-Monitor Health:
+Keelflow uses `/home/node/.flowise` while `/home/node/.keelflow` is empty. If your compose file sets `DATABASE_PATH`, `SECRETKEY_PATH`, `LOG_PATH` or `BLOB_STORAGE_PATH`, those keep working as before.
 
-```
-docker compose -f docker-compose-queue-source.yml ps
-```
+## Queue mode
 
-### From pre-built images:
+A main instance puts executions on a Redis queue and workers run them. Both use the same image; workers start with the `worker` command.
 
-You can also use the pre-built images:
+- [docker-compose-queue-prebuilt.yml](docker-compose-queue-prebuilt.yml) — published image, Redis, one worker
+- [docker-compose-queue-source.yml](docker-compose-queue-source.yml) — builds the image from this repository
 
-```
+```bash
 docker compose -f docker-compose-queue-prebuilt.yml up -d
 ```
 
-Monitor Health:
+Main and workers must share the database, the encryption key (`SECRETKEY_PATH` or `FLOWISE_SECRETKEY_OVERWRITE`), storage and `QUEUE_NAME`.
 
+## Useful commands
+
+```bash
+docker logs -f keelflow
+docker exec keelflow node /app/bin/run user owner@example.com 'New-password-1'   # reset the owner's password
 ```
-docker compose -f docker-compose-queue-prebuilt.yml ps
-```
+
+All settings are listed in [.env.example](.env.example).

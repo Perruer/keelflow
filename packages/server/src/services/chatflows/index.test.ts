@@ -101,7 +101,7 @@ jest.mock('../../schedule/ScheduleBeat', () => ({
         })
     }
 }))
-jest.mock('flowise-components', () => ({ removeFolderFromStorage: jest.fn().mockResolvedValue({ totalSize: 0 }) }), { virtual: true })
+jest.mock('keelflow-components', () => ({ removeFolderFromStorage: jest.fn().mockResolvedValue({ totalSize: 0 }) }), { virtual: true })
 jest.mock('uuid', () => ({ validate: jest.fn().mockReturnValue(true) }))
 jest.mock('http-status-codes', () => ({
     StatusCodes: { OK: 200, BAD_REQUEST: 400, NOT_FOUND: 404, INTERNAL_SERVER_ERROR: 500 }

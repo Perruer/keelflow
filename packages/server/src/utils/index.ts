@@ -38,8 +38,9 @@ import {
     IMessage,
     FlowiseMemory,
     IFileUpload,
-    StorageProviderFactory
-} from 'flowise-components'
+    StorageProviderFactory,
+    getDataDir
+} from 'keelflow-components'
 import { randomBytes } from 'crypto'
 import { AES, enc } from 'crypto-js'
 
@@ -1583,7 +1584,7 @@ export const getEncryptionKey = async (): Promise<string> => {
         const encryptKey = generateEncryptKey()
         const defaultLocation = process.env.SECRETKEY_PATH
             ? path.join(process.env.SECRETKEY_PATH, 'encryption.key')
-            : path.join(getUserHome(), '.flowise', 'encryption.key')
+            : path.join(getDataDir(), 'encryption.key')
         await fs.promises.writeFile(defaultLocation, encryptKey)
         return encryptKey
     }
@@ -1667,7 +1668,7 @@ export const generateEncryptKey = (): string => {
  * Used for file-based storage of TOKEN_HASH_SECRET, EXPRESS_SESSION_SECRET, JWT_*, etc.
  */
 export const getAuthSecretsDirectory = (): string => {
-    return process.env.SECRETKEY_PATH ? process.env.SECRETKEY_PATH : path.join(getUserHome(), '.flowise')
+    return process.env.SECRETKEY_PATH ? process.env.SECRETKEY_PATH : getDataDir()
 }
 
 /**
@@ -2016,9 +2017,7 @@ export const getAPIOverrideConfig = (chatflow: IChatFlow) => {
 }
 
 export const getUploadPath = (): string => {
-    return process.env.BLOB_STORAGE_PATH
-        ? path.join(process.env.BLOB_STORAGE_PATH, 'uploads')
-        : path.join(getUserHome(), '.flowise', 'uploads')
+    return process.env.BLOB_STORAGE_PATH ? path.join(process.env.BLOB_STORAGE_PATH, 'uploads') : path.join(getDataDir(), 'uploads')
 }
 
 export function generateId() {

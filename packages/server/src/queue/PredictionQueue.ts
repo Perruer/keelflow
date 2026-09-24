@@ -9,7 +9,7 @@ import { BaseQueue } from './BaseQueue'
 import { RedisOptions } from 'bullmq'
 import { UsageCacheManager } from '../UsageCacheManager'
 import logger from '../utils/logger'
-import { generateAgentflowv2 as generateAgentflowv2_json } from 'flowise-components'
+import { generateAgentflowv2 as generateAgentflowv2_json } from 'keelflow-components'
 import { databaseEntities } from '../utils'
 import { executeCustomNodeFunction } from '../utils/executeCustomNodeFunction'
 

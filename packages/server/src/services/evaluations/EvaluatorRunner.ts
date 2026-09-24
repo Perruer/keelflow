@@ -1,5 +1,5 @@
 import evaluatorsService from '../evaluator'
-import { ICommonObject } from 'flowise-components'
+import { ICommonObject } from 'keelflow-components'
 
 interface EvaluatorReturnType {
     name: string

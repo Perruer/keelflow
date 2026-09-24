@@ -1,5 +1,5 @@
 import { stripProtectedFields } from '../../utils/stripProtectedFields'
-import { extractResponseContent, ICommonObject } from 'flowise-components'
+import { extractResponseContent, ICommonObject } from 'keelflow-components'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep, isEqual, uniqWith } from 'lodash'
 import OpenAI from 'openai'

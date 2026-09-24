@@ -180,13 +180,13 @@ export abstract class BaseCommand extends Command {
             try {
                 // Shut down the app after timeout if it ever stuck removing pools
                 setTimeout(async () => {
-                    logger.info('Flowise was forced to shut down after 30 secs')
+                    logger.info('Keelflow was forced to shut down after 30 secs')
                     await this.failExit()
                 }, 30000)
 
                 await this.stopProcess()
             } catch (error) {
-                logger.error('There was an error shutting down Flowise...', error)
+                logger.error('There was an error shutting down Keelflow...', error)
             }
         }
     }

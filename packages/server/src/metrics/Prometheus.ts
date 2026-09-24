@@ -1,7 +1,7 @@
 import { FLOWISE_METRIC_COUNTERS, IMetricsProvider } from '../Interface.Metrics'
 import express from 'express'
 import promClient, { Counter, Histogram, Registry } from 'prom-client'
-import { getVersion } from 'flowise-components'
+import { getVersion } from 'keelflow-components'
 
 export class Prometheus implements IMetricsProvider {
     private app: express.Application
@@ -59,7 +59,7 @@ export class Prometheus implements IMetricsProvider {
         try {
             const versionGaugeCounter = new promClient.Gauge({
                 name: 'flowise_version_info',
-                help: 'Flowise version info.',
+                help: 'Keelflow version info.',
                 labelNames: ['version'],
                 registers: [this.register] // Explicitly set the registry
             })

@@ -21,9 +21,9 @@ const AnnouncementBanner = ({ onClose }) => (
             '& .MuiAlert-action': { position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', p: 0 }
         }}
     >
-        We&apos;re sunsetting Flowise.{' '}
-        <Link href='https://flowiseai.com/sunset' target='_blank' rel='noopener noreferrer'>
-            Learn more
+        Keelflow continues Flowise with security fixes. Your Flowise flows, credentials and API keys work as before.{' '}
+        <Link href='https://github.com/Perruer/keelflow#migrating-from-flowise' target='_blank' rel='noopener noreferrer'>
+            What changed
         </Link>
     </Alert>
 )

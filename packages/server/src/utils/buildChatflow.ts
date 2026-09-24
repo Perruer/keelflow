@@ -19,7 +19,7 @@ import {
     EvaluationRunner,
     handleEscapeCharacters,
     IServerSideEventStreamer
-} from 'flowise-components'
+} from 'keelflow-components'
 import { StatusCodes } from 'http-status-codes'
 import {
     IncomingInput,

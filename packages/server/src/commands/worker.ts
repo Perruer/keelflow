@@ -19,7 +19,7 @@ export default class Worker extends BaseCommand {
     scheduleWorkerId: string
 
     async run(): Promise<void> {
-        logger.info('Starting Flowise Worker...')
+        logger.info('Starting Keelflow Worker...')
 
         const { appDataSource, telemetry, componentNodes, cachePool, abortControllerPool, usageCacheManager } = await this.prepareData()
 
@@ -106,18 +106,18 @@ export default class Worker extends BaseCommand {
         try {
             const queueManager = QueueManager.getInstance()
             const predictionWorker = queueManager.getQueue('prediction').getWorker()
-            logger.info(`Shutting down Flowise Prediction Worker ${this.predictionWorkerId}...`)
+            logger.info(`Shutting down Keelflow Prediction Worker ${this.predictionWorkerId}...`)
             await predictionWorker.close()
 
             const upsertWorker = queueManager.getQueue('upsert').getWorker()
-            logger.info(`Shutting down Flowise Upsertion Worker ${this.upsertionWorkerId}...`)
+            logger.info(`Shutting down Keelflow Upsertion Worker ${this.upsertionWorkerId}...`)
             await upsertWorker.close()
 
             const scheduleWorker = queueManager.getQueue('schedule').getWorker()
-            logger.info(`Shutting down Flowise Schedule Worker ${this.scheduleWorkerId}...`)
+            logger.info(`Shutting down Keelflow Schedule Worker ${this.scheduleWorkerId}...`)
             await scheduleWorker.close()
         } catch (error) {
-            logger.error('There was an error shutting down Flowise Worker...', error)
+            logger.error('There was an error shutting down Keelflow Worker...', error)
             await this.failExit()
         }
 

@@ -3,7 +3,7 @@ import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { ChatFlow } from '../../database/entities/ChatFlow'
-import { INodeParams } from 'flowise-components'
+import { INodeParams } from 'keelflow-components'
 import { resolveScheduleCron } from '../schedule'
 import { IComponentNodes, IReactFlowEdge, IReactFlowNode, IReactFlowObject } from '../../Interface'
 

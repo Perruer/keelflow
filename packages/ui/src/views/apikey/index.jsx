@@ -391,7 +391,7 @@ const APIKey = () => {
                             search={true}
                             searchPlaceholder='Search API Keys'
                             title='API Keys'
-                            description='Flowise API & SDK authentication keys'
+                            description='Keys for the Keelflow API, limited to the permissions you choose'
                         >
                             <StyledPermissionButton
                                 permissionId={'apikeys:create'}

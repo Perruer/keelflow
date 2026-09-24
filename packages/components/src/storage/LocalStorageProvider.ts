@@ -4,6 +4,7 @@ import path from 'node:path'
 import { transports } from 'winston'
 import DailyRotateFile from 'winston-daily-rotate-file'
 import { BaseStorageProvider } from './BaseStorageProvider'
+import { getDataDir } from '../utils'
 import { FileInfo, StorageResult, StorageSizeResult } from './IStorageProvider'
 
 export class LocalStorageProvider extends BaseStorageProvider {
@@ -341,17 +342,11 @@ export class LocalStorageProvider extends BaseStorageProvider {
     }
 
     private getUploadPath(): string {
-        return process.env.BLOB_STORAGE_PATH
-            ? path.join(process.env.BLOB_STORAGE_PATH, 'uploads')
-            : path.join(this.getUserHome(), '.flowise', 'uploads')
-    }
-
-    private getUserHome(): string {
-        return process.env.HOME || process.env.USERPROFILE || process.env.HOMEPATH || ''
+        return process.env.BLOB_STORAGE_PATH ? path.join(process.env.BLOB_STORAGE_PATH, 'uploads') : path.join(getDataDir(), 'uploads')
     }
 
     getLoggerTransports(logType: 'server' | 'error' | 'requests' | 'audit', config?: any): any[] {
-        const logDir = config?.logging?.dir || path.join(this.getUserHome(), '.flowise', 'logs')
+        const logDir = config?.logging?.dir || path.join(getDataDir(), 'logs')
 
         if (!fs.existsSync(logDir)) {
             fs.mkdirSync(logDir, { recursive: true })

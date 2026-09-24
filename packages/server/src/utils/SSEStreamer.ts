@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { IServerSideEventStreamer } from 'flowise-components'
+import { IServerSideEventStreamer } from 'keelflow-components'
 
 // define a new type that has a client type (INTERNAL or EXTERNAL) and Response type
 type Client = {

@@ -1,5 +1,5 @@
 import path from 'path'
-import { getBaseClasses, getUserHome } from '../../../../src/utils'
+import { getBaseClasses, getDataDir } from '../../../../src/utils'
 import { SaverOptions } from '../interface'
 import { ICommonObject, IDatabaseEntity, INode, INodeData, INodeParams } from '../../../../src/Interface'
 import { SqliteSaver } from './sqliteSaver'
@@ -69,7 +69,7 @@ class SQLiteAgentMemory_Memory implements INode {
 
         const threadId = options.sessionId || options.chatId
 
-        const database = validateSQLitePath(path.join(process.env.DATABASE_PATH ?? path.join(getUserHome(), '.flowise'), 'database.sqlite'))
+        const database = validateSQLitePath(path.join(process.env.DATABASE_PATH ?? getDataDir(), 'database.sqlite'))
 
         const datasourceOptions: ICommonObject = mergeDataSourceOptions(
             {

@@ -1,5 +1,5 @@
 /**
- * Node-level utilities. Prefer importing from 'flowise-components/nodes' so that
+ * Node-level utilities. Prefer importing from 'keelflow-components/nodes' so that
  * refactors under nodes/ do not break consumers.
  */
 export {

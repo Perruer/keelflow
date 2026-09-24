@@ -3,7 +3,7 @@ import { Resource } from '@opentelemetry/resources'
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions'
 import { MeterProvider, PeriodicExportingMetricReader, Histogram } from '@opentelemetry/sdk-metrics'
 import { diag, DiagLogLevel, DiagConsoleLogger, Attributes, Counter } from '@opentelemetry/api'
-import { getVersion } from 'flowise-components'
+import { getVersion } from 'keelflow-components'
 import express from 'express'
 
 // Create a static map to track created metrics and prevent duplicates
@@ -132,7 +132,7 @@ export class OpenTelemetry implements IMetricsProvider {
                 // Add version gauge if not already created
                 if (!createdMetrics.has('flowise_version')) {
                     const versionGuage = meter.createGauge('flowise_version', {
-                        description: 'Flowise version'
+                        description: 'Keelflow version'
                     })
                     // remove the last dot from the version string, e.g. 2.1.3 -> 2.13 (gauge needs a number - float)
                     const formattedVersion = flowiseVersion.version.replace(/\.(\d+)$/, '$1')

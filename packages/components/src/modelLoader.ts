@@ -29,17 +29,24 @@ const isValidUrl = (urlString: string) => {
     return url.protocol === 'http:' || url.protocol === 'https:'
 }
 
+// A remote model list is fetched at most once an hour
+const REMOTE_CACHE_MS = 60 * 60 * 1000
+let remoteCache: { url: string; data: any; at: number } | undefined
+
 /**
- * Load the raw model file from either a URL or a local file
- * If any of the loading fails, fallback to the default models.json file on disk
+ * Load the raw model file from MODEL_LIST_CONFIG_JSON (a URL or a local file) when set.
+ * Otherwise, or if loading fails, use the models.json shipped with Keelflow. Flowise fetched
+ * the list from GitHub on every call by default; Keelflow makes no request unless asked to.
  */
 const getRawModelFile = async () => {
-    const modelFile =
-        process.env.MODEL_LIST_CONFIG_JSON ?? 'https://raw.githubusercontent.com/FlowiseAI/Flowise/main/packages/components/models.json'
+    const modelFile = process.env.MODEL_LIST_CONFIG_JSON
     try {
+        if (!modelFile) throw new Error('No custom model list configured')
         if (isValidUrl(modelFile)) {
-            const resp = await axios.get(modelFile)
+            if (remoteCache && remoteCache.url === modelFile && Date.now() - remoteCache.at < REMOTE_CACHE_MS) return remoteCache.data
+            const resp = await axios.get(modelFile, { timeout: 10000 })
             if (resp.status === 200 && resp.data) {
+                remoteCache = { url: modelFile, data: resp.data, at: Date.now() }
                 return resp.data
             } else {
                 throw new Error('Error fetching model list')

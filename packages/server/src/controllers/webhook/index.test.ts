@@ -47,7 +47,7 @@ jest.mock('../../utils/logger', () => ({
     __esModule: true,
     default: { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() }
 }))
-jest.mock('flowise-components', () => ({
+jest.mock('keelflow-components', () => ({
     redactSensitiveHeaders: (headers: Record<string, any> | null | undefined): Record<string, any> => {
         if (!headers) return {}
         const SENSITIVE = new Set([

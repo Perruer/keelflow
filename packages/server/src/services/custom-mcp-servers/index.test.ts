@@ -84,7 +84,7 @@ const mockToolkitImpl = jest.fn().mockImplementation(() => ({
     _tools: { tools: [{ name: 'tool1' }] },
     client: { close: mockClose }
 }))
-jest.mock('flowise-components', () => ({
+jest.mock('keelflow-components', () => ({
     MCPToolkit: mockToolkitImpl,
     checkDenyList: (url: string) => mockCheckDenyList(url),
     isValidURL: (url: string) => {
@@ -105,7 +105,7 @@ jest.mock('../../utils/logger', () => ({
 
 import customMcpServersService from './index'
 import { encryptCredentialData, decryptCredentialData } from '../../utils'
-import { MCPToolkit } from 'flowise-components'
+import { MCPToolkit } from 'keelflow-components'
 
 const mockEncrypt = encryptCredentialData as jest.Mock
 const mockDecrypt = decryptCredentialData as jest.Mock

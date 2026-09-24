@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 208 48" width="208" height="48">
+  <title>Keelflow</title>
+  <rect width="48" height="48" rx="11" fill="#0B3B5C"/>
+  <path d="M11 15.5 H37 L24 37 Z" fill="none" stroke="#35C2AE" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M24 15.5 V37" stroke="#35C2AE" stroke-width="3.2" stroke-linecap="round"/>
+  <circle cx="11" cy="15.5" r="4.6" fill="#F4F7FA"/>
+  <circle cx="37" cy="15.5" r="4.6" fill="#F4F7FA"/>
+  <circle cx="24" cy="37" r="4.6" fill="#35C2AE"/>
+  <text x="60" y="34" font-family="Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#0B3B5C">Keel<tspan fill="#1E9E8C">flow</tspan></text>
+</svg>

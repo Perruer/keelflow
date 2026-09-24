@@ -1,5 +1,5 @@
 name: Feature Request
-description: Suggest a new feature or enhancement for Flowise
+description: Suggest a new feature or enhancement for Keelflow
 labels: ['enhancement']
 assignees: []
 body:
@@ -12,7 +12,7 @@ body:
       id: feature-description
       attributes:
           label: Feature Description
-          description: A clear and concise description of the feature you'd like to see in Flowise.
+          description: A clear and concise description of the feature you'd like to see in Keelflow.
           placeholder: Describe what you want to be added or improved...
       validations:
           required: true

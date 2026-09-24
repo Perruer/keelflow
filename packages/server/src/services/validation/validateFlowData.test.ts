@@ -1,4 +1,4 @@
-jest.mock('flowise-components', () => ({}))
+jest.mock('keelflow-components', () => ({}))
 jest.mock('../../utils/getRunningExpressApp', () => ({ getRunningExpressApp: jest.fn() }))
 jest.mock('../../utils/logger', () => ({
     __esModule: true,

@@ -1,4 +1,4 @@
-import { ClientType, INodeOptionsValue } from 'flowise-components'
+import { ClientType, INodeOptionsValue } from 'keelflow-components'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep, omit } from 'lodash'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'

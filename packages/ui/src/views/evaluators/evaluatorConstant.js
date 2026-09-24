@@ -70,7 +70,7 @@ export const evaluators = [
         type: 'numeric',
         label: 'Total API Latency',
         name: 'apiLatency',
-        description: 'Total time taken for the Flowise Prediction API call (milliseconds).'
+        description: 'Total time taken for the Keelflow Prediction API call (milliseconds).'
     },
     {
         type: 'numeric',

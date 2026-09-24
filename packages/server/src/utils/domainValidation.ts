@@ -1,4 +1,4 @@
-import { isValidUUID } from 'flowise-components'
+import { isValidUUID } from 'keelflow-components'
 import chatflowsService from '../services/chatflows'
 import logger from './logger'
 

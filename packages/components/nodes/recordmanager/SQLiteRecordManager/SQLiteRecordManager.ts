@@ -1,5 +1,5 @@
 import { ICommonObject, INode, INodeData, INodeParams } from '../../../src/Interface'
-import { getBaseClasses, getUserHome } from '../../../src/utils'
+import { getBaseClasses, getDataDir } from '../../../src/utils'
 import { ListKeyOptions, RecordManagerInterface, UpdateOptions } from '@langchain/community/indexes/base'
 import { DataSource } from 'typeorm'
 import path from 'path'
@@ -121,7 +121,7 @@ class SQLiteRecordManager_RecordManager implements INode {
             additionalConfiguration = sanitizeDataSourceOptions(additionalConfiguration)
         }
 
-        const database = validateSQLitePath(path.join(process.env.DATABASE_PATH ?? path.join(getUserHome(), '.flowise'), 'database.sqlite'))
+        const database = validateSQLitePath(path.join(process.env.DATABASE_PATH ?? getDataDir(), 'database.sqlite'))
 
         const sqliteOptions = mergeDataSourceOptions(
             {

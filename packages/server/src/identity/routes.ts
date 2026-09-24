@@ -57,7 +57,7 @@ authRouter.get(
     ['/permissions/:type', '/:type'],
     handle(async (req, res) => {
         ownerOnly(req)
-        res.json(getPermissionCatalog())
+        res.json(getPermissionCatalog(req.params.type))
     })
 )
 

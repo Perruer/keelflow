@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { QueryRunner } from 'typeorm'
 import { ChatFlow, EnumChatflowType } from '../../database/entities/ChatFlow'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { ChatflowType } from '../../Interface'

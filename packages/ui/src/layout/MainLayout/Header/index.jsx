@@ -78,13 +78,11 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     }
 }))
 
-const GitHubStarButton = ({ starCount, isDark }) => {
+const GitHubStarButton = ({ isDark }) => {
     const theme = useTheme()
 
-    const formattedStarCount = starCount.toLocaleString()
-
     return (
-        <Link href='https://github.com/FlowiseAI/Flowise' target='_blank' underline='none' sx={{ display: 'inline-flex' }}>
+        <Link href='https://github.com/Perruer/keelflow' target='_blank' underline='none' sx={{ display: 'inline-flex' }}>
             <Box
                 sx={{
                     display: 'flex',
@@ -104,8 +102,7 @@ const GitHubStarButton = ({ starCount, isDark }) => {
                         alignItems: 'center',
                         padding: '3px 10px',
                         backgroundColor: isDark ? darken(theme.palette.background.paper, 0.2) : '#f6f8fa',
-                        color: isDark ? '#c9d1d9' : '#24292e',
-                        borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}`
+                        color: isDark ? '#c9d1d9' : '#24292e'
                     }}
                 >
                     <svg height='16' width='16' viewBox='0 0 16 16' style={{ marginRight: '4px', fill: isDark ? '#c9d1d9' : '#24292e' }}>
@@ -115,19 +112,7 @@ const GitHubStarButton = ({ starCount, isDark }) => {
                         ></path>
                     </svg>
                     <Typography variant='caption' sx={{ fontWeight: 600, color: isDark ? 'white' : theme.palette.text.primary }}>
-                        Star
-                    </Typography>
-                </Box>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '3px 10px',
-                        backgroundColor: isDark ? theme.palette.background.paper : 'white'
-                    }}
-                >
-                    <Typography variant='caption' sx={{ fontWeight: 600, color: isDark ? 'white' : theme.palette.text.primary }}>
-                        {formattedStarCount}
+                        GitHub
                     </Typography>
                 </Box>
             </Box>
@@ -136,7 +121,6 @@ const GitHubStarButton = ({ starCount, isDark }) => {
 }
 
 GitHubStarButton.propTypes = {
-    starCount: PropTypes.number.isRequired,
     isDark: PropTypes.bool.isRequired
 }
 
@@ -150,7 +134,6 @@ const Header = ({ handleLeftDrawerToggle }) => {
     const dispatch = useDispatch()
     const { isEnterpriseLicensed, isCloud, isOpenSource } = useConfig()
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
-    const [starCount, setStarCount] = useState(0)
 
     useNotifier()
 
@@ -189,24 +172,6 @@ const Header = ({ handleLeftDrawerToggle }) => {
             console.error(e)
         }
     }, [logoutApi.data])
-
-    useEffect(() => {
-        if (isCloud || isOpenSource) {
-            const fetchStarCount = async () => {
-                try {
-                    const response = await fetch('https://api.github.com/repos/FlowiseAI/Flowise')
-                    const data = await response.json()
-                    if (data.stargazers_count) {
-                        setStarCount(data.stargazers_count)
-                    }
-                } catch (error) {
-                    setStarCount(0)
-                }
-            }
-
-            fetchStarCount()
-        }
-    }, [isCloud, isOpenSource])
 
     return (
         <>
@@ -258,7 +223,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
                         }
                     }}
                 >
-                    <GitHubStarButton starCount={starCount} isDark={isDark} />
+                    <GitHubStarButton isDark={isDark} />
                 </Box>
             ) : (
                 <Box sx={{ flexGrow: 1 }} />

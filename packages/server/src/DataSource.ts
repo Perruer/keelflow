@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import path from 'path'
 import * as fs from 'fs'
 import { DataSource } from 'typeorm'
-import { getUserHome } from './utils'
+import { getDataDir } from 'keelflow-components'
 import { entities } from './database/entities'
 import { sqliteMigrations } from './database/migrations/sqlite'
 import { mysqlMigrations } from './database/migrations/mysql'
@@ -14,7 +14,7 @@ let appDataSource: DataSource
 
 export const init = async (): Promise<void> => {
     let homePath
-    let flowisePath = path.join(getUserHome(), '.flowise')
+    let flowisePath = getDataDir()
     if (!fs.existsSync(flowisePath)) {
         fs.mkdirSync(flowisePath)
     }
@@ -84,7 +84,7 @@ export const init = async (): Promise<void> => {
                 poolErrorHandler: (err) => {
                     logger.error(`Database pool error: ${JSON.stringify(err)}`)
                 },
-                applicationName: 'Flowise'
+                applicationName: 'Keelflow'
             })
             break
         default:

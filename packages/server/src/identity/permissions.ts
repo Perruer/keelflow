@@ -50,10 +50,14 @@ const CATALOG: Record<string, string[]> = {
 
 export type PermissionItem = { key: string; value: string; isOpenSource: boolean; isEnterprise: boolean; isCloud: boolean }
 
+// Export/import of the whole workspace is for the owner only (services/apikey refuses workspace:* keys)
+const OWNER_ONLY_CATEGORIES = ['workspace']
+
 /** Grouped the way the API key dialog in the UI expects it */
-export const getPermissionCatalog = (): Record<string, PermissionItem[]> => {
+export const getPermissionCatalog = (type?: string): Record<string, PermissionItem[]> => {
     const catalog: Record<string, PermissionItem[]> = {}
     for (const [category, actions] of Object.entries(CATALOG)) {
+        if (type === 'API_KEY' && OWNER_ONLY_CATEGORIES.includes(category)) continue
         catalog[category] = actions.map((action) => ({
             key: `${category}:${action}`,
             value: ACTIONS[action] ?? action,

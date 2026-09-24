@@ -1,4 +1,4 @@
-import { INodeParams } from 'flowise-components'
+import { INodeParams } from 'keelflow-components'
 import { IReactFlowObject } from '../Interface'
 
 const SENSITIVE_HEADER_KEYS = new Set(['authorization', 'x-api-key', 'x-auth-token', 'cookie'])

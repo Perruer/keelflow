@@ -299,7 +299,7 @@ const RegisterPage = () => {
                             .
                         </Typography>
                     </Stack>
-                    <form onSubmit={register} data-rewardful>
+                    <form onSubmit={register}>
                         <Stack sx={{ width: '100%', flexDirection: 'column', alignItems: 'left', justifyContent: 'center', gap: 2 }}>
                             <Box>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>

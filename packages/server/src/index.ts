@@ -170,8 +170,13 @@ export class App {
 
         // Enhanced trust proxy settings for load balancer
         let trustProxy: string | boolean | number | undefined = process.env.TRUST_PROXY
-        if (typeof trustProxy === 'undefined' || trustProxy.trim() === '' || trustProxy === 'true') {
-            // Default to trust all proxies
+        if (typeof trustProxy === 'undefined' || trustProxy.trim() === '') {
+            // Default: trust X-Forwarded-For only from proxies on this host or a private network
+            // (Docker, Kubernetes, a reverse proxy on the LAN). Trusting every hop let any client
+            // pick its own IP and slip past the rate limiters.
+            trustProxy = 'loopback, linklocal, uniquelocal'
+        } else if (trustProxy === 'true') {
+            // Trust all proxies (Flowise's default)
             trustProxy = true
         } else if (trustProxy === 'false') {
             // Disable trust proxy
@@ -270,7 +275,7 @@ export class App {
         this.app.get('/api/v1/ip', (request, response) => {
             response.send({
                 ip: request.ip,
-                msg: 'Check returned IP address in the response. If it matches your current IP address ( which you can get by going to http://ip.nfriedly.com/ or https://api.ipify.org/ ), then the number of proxies is correct and the rate limiter should now work correctly. If not, increase the number of proxies by 1 and restart Cloud-Hosted Flowise until the IP address matches your own. Visit https://docs.flowiseai.com/configuration/rate-limit#cloud-hosted-rate-limit-setup-guide for more information.'
+                msg: 'Check returned IP address in the response. If it matches your current IP address ( which you can get by going to http://ip.nfriedly.com/ or https://api.ipify.org/ ), then the number of proxies is correct and the rate limiter should now work correctly. If not, increase the number of proxies by 1 and restart Keelflow until the IP address matches your own. Visit https://docs.flowiseai.com/configuration/rate-limit#cloud-hosted-rate-limit-setup-guide for more information.'
             })
         })
 
@@ -292,7 +297,7 @@ export class App {
         // Serve UI static
         // ----------------------------------------
 
-        const packagePath = getNodeModulesPackagePath('flowise-ui')
+        const packagePath = getNodeModulesPackagePath('keelflow-ui')
         const uiBuildPath = path.join(packagePath, 'build')
         const uiHtmlPath = path.join(packagePath, 'build', 'index.html')
 
@@ -317,7 +322,7 @@ export class App {
             }
             await Promise.all(removePromises)
         } catch (e) {
-            logger.error(`❌[server]: Flowise Server shut down error: ${e}`)
+            logger.error(`❌[server]: Keelflow server shut down error: ${e}`)
         }
     }
 }
@@ -335,7 +340,7 @@ export async function start(): Promise<void> {
     await serverApp.config()
 
     server.listen(port, host, () => {
-        logger.info(`⚡️ [server]: Flowise Server is listening at ${host ? 'http://' + host : ''}:${port}`)
+        logger.info(`⚡️ [server]: Keelflow server is listening at ${host ? 'http://' + host : ''}:${port}`)
     })
 }
 

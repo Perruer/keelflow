@@ -11,7 +11,7 @@ import {
     IUsedTool,
     IDocument,
     IServerSideEventStreamer
-} from 'flowise-components'
+} from 'keelflow-components'
 import { omit, cloneDeep, flatten, uniq } from 'lodash'
 import { StateGraph, END, START } from '@langchain/langgraph'
 import { Document } from '@langchain/core/documents'

@@ -3,33 +3,33 @@ version: '3.1'
 services:
     redis:
         image: redis:alpine
-        container_name: flowise-redis
+        container_name: keelflow-redis
         ports:
             - '6379:6379'
         volumes:
             - redis_data:/data
         networks:
-            - flowise-net
+            - keelflow-net
 
-    flowise:
-        container_name: flowise-main
+    keelflow:
+        container_name: keelflow-main
         build:
             context: .. # Build using the Dockerfile in the root directory
-            dockerfile: docker/Dockerfile
+            dockerfile: Dockerfile
         ports:
             - '${PORT}:${PORT}'
         volumes:
-            # Mount local .flowise to container's default location.
+            # Mount local .keelflow to container's default location.
             # Container runs as the non-root `node` user, whose home is /home/node.
-            # Ensure the host directory is writable by that user (e.g. `chown -R 1000:1000 ../.flowise` on Linux hosts).
-            - ../.flowise:/home/node/.flowise
+            # Ensure the host directory is writable by that user (e.g. `chown -R 1000:1000 ../.keelflow` on Linux hosts).
+            - ../.keelflow:/home/node/.keelflow
         environment:
-            # --- Essential Flowise Vars ---
+            # --- Essential Keelflow vars ---
             - PORT=${PORT:-3000}
-            - DATABASE_PATH=/home/node/.flowise
-            - SECRETKEY_PATH=/home/node/.flowise
-            - LOG_PATH=/home/node/.flowise/logs
-            - BLOB_STORAGE_PATH=/home/node/.flowise/storage
+            - DATABASE_PATH=/home/node/.keelflow
+            - SECRETKEY_PATH=/home/node/.keelflow
+            - LOG_PATH=/home/node/.keelflow/logs
+            - BLOB_STORAGE_PATH=/home/node/.keelflow/storage
             # --- Queue Vars (Main Instance) ---
             - MODE=queue
             - QUEUE_NAME=flowise-queue # Ensure this matches worker
@@ -37,38 +37,38 @@ services:
         depends_on:
             - redis
         networks:
-            - flowise-net
+            - keelflow-net
 
-    flowise-worker:
-        container_name: flowise-worker
+    keelflow-worker:
+        container_name: keelflow-worker
         build:
             context: .. # Build context is still the root
-            dockerfile: docker/worker/Dockerfile # Ensure this path is correct
+            dockerfile: Dockerfile
+        command: ["worker"]
         volumes:
-            # Mount same local .flowise to worker.
+            # Mount same local .keelflow to worker.
             # Container runs as the non-root `node` user, whose home is /home/node.
-            - ../.flowise:/home/node/.flowise
+            - ../.keelflow:/home/node/.keelflow
         environment:
-            # --- Essential Flowise Vars ---
-            - WORKER_PORT=${WORKER_PORT:-5566} # Port for worker healthcheck
-            - DATABASE_PATH=/home/node/.flowise
-            - SECRETKEY_PATH=/home/node/.flowise
-            - LOG_PATH=/home/node/.flowise/logs
-            - BLOB_STORAGE_PATH=/home/node/.flowise/storage
+            # --- Essential Keelflow vars ---
+            - DATABASE_PATH=/home/node/.keelflow
+            - SECRETKEY_PATH=/home/node/.keelflow
+            - LOG_PATH=/home/node/.keelflow/logs
+            - BLOB_STORAGE_PATH=/home/node/.keelflow/storage
             # --- Queue Vars (Main Instance) ---
             - MODE=queue
             - QUEUE_NAME=flowise-queue # Ensure this matches worker
             - REDIS_URL=redis://redis:6379 # Use service name 'redis'
         depends_on:
             - redis
-            - flowise
+            - keelflow
         networks:
-            - flowise-net
+            - keelflow-net
 
 volumes:
     redis_data:
         driver: local
 
 networks:
-    flowise-net:
+    keelflow-net:
         driver: bridge

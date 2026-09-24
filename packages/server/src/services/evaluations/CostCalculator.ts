@@ -1,4 +1,4 @@
-import { ICommonObject } from 'flowise-components'
+import { ICommonObject } from 'keelflow-components'
 
 // fractionDigits is the number of digits after the decimal point, for display purposes
 const fractionDigits = 2

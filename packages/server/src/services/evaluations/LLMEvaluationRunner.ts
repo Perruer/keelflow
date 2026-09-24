@@ -1,4 +1,4 @@
-import { convertSchemaToZod, ICommonObject } from 'flowise-components'
+import { convertSchemaToZod, ICommonObject } from 'keelflow-components'
 import { z } from 'zod/v3'
 import { RunnableSequence } from '@langchain/core/runnables'
 import { PromptTemplate } from '@langchain/core/prompts'
