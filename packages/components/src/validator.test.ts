@@ -9,7 +9,7 @@ import {
     validateSQLitePath
 } from './validator'
 import path from 'path'
-import { getUserHome } from './utils'
+import { getDataDir, getUserHome } from './utils'
 import * as utils from './utils'
 
 describe('isPathTraversal', () => {
@@ -264,22 +264,23 @@ describe('validateMimeTypeAndExtensionMatch', () => {
 
 describe('validateVectorStorePath', () => {
     const userHome = getUserHome()
-    const defaultFlowisePath = path.join(userHome, '.flowise')
+    // ~/.keelflow, or ~/.flowise on machines that still have only that folder
+    const defaultFlowisePath = getDataDir()
 
     describe('valid paths', () => {
         it('should return default path when no path is provided', () => {
             const result = validateVectorStorePath(undefined)
-            expect(result).toBe(path.join(userHome, '.flowise', 'vectorstore'))
+            expect(result).toBe(path.join(getDataDir(), 'vectorstore'))
         })
 
         it('should return default path when empty string is provided', () => {
             const result = validateVectorStorePath('')
-            expect(result).toBe(path.join(userHome, '.flowise', 'vectorstore'))
+            expect(result).toBe(path.join(getDataDir(), 'vectorstore'))
         })
 
         it('should return default path when whitespace string is provided', () => {
             const result = validateVectorStorePath('   ')
-            expect(result).toBe(path.join(userHome, '.flowise', 'vectorstore'))
+            expect(result).toBe(path.join(getDataDir(), 'vectorstore'))
         })
 
         it('should accept relative path within .flowise directory', () => {
@@ -288,7 +289,7 @@ describe('validateVectorStorePath', () => {
 
             // Should resolve to absolute path within .flowise
             expect(path.isAbsolute(result)).toBe(true)
-            expect(result).toContain('.flowise')
+            expect(result.startsWith(defaultFlowisePath)).toBe(true)
         })
 
         it('should accept absolute path within .flowise directory', () => {
@@ -471,15 +472,14 @@ describe('validateVectorStorePath', () => {
         })
 
         it('should return default path when undefined', () => {
-            const userHome = getUserHome()
-            expect(validateVectorStorePath(undefined)).toBe(path.join(userHome, '.flowise', 'vectorstore'))
+            expect(validateVectorStorePath(undefined)).toBe(path.join(getDataDir(), 'vectorstore'))
         })
     })
 })
 
 describe('validateSQLitePath', () => {
     const userHome = getUserHome()
-    const defaultFlowiseDir = path.join(userHome, '.flowise')
+    const defaultFlowiseDir = getDataDir()
 
     describe('valid paths', () => {
         it('should resolve a simple filename to ~/.flowise/<filename>', () => {
@@ -644,11 +644,11 @@ describe('validateSQLitePath', () => {
     })
 
     describe('Windows case-insensitive path comparison', () => {
-        // Simulate Windows: getUserHome() returns mixed-case path, user supplies lowercase version.
+        // Simulate Windows: the data folder has a mixed-case path, user supplies lowercase version.
         // path.normalize() on Unix preserves casing, so this exercises the toLowerCase branch.
         beforeEach(() => {
             Object.defineProperty(process, 'platform', { value: 'win32', configurable: true })
-            jest.spyOn(utils, 'getUserHome').mockReturnValue('/Users/TestUser')
+            jest.spyOn(utils, 'getDataDir').mockReturnValue('/Users/TestUser/.flowise')
         })
 
         afterEach(() => {
@@ -657,7 +657,7 @@ describe('validateSQLitePath', () => {
         })
 
         it('should accept a valid path whose casing differs from the allowed directory', () => {
-            // allowedDir = /Users/TestUser/.flowise (mixed case from getUserHome mock)
+            // allowedDir = /Users/TestUser/.flowise (mixed case from getDataDir mock)
             // user input  = /users/testuser/.flowise/mydb.sqlite (all lowercase)
             const result = validateSQLitePath('/users/testuser/.flowise/mydb.sqlite')
             expect(result).toBe('/users/testuser/.flowise/mydb.sqlite')
