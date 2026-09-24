@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B2A42"/>
+      <stop offset="1" stop-color="#0B3B5C"/>
+    </linearGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#ffffff" opacity="0.06"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect width="1280" height="640" fill="url(#dots)"/>
+
+  <!-- flow graph on the right -->
+  <g transform="translate(40 0)" opacity="0.9" stroke="#35C2AE" stroke-width="4" fill="none" stroke-linecap="round">
+    <path d="M880 190 C 960 190, 960 300, 1040 300"/>
+    <path d="M880 410 C 960 410, 960 300, 1040 300"/>
+    <path d="M1040 300 C 1110 300, 1110 450, 1170 450"/>
+  </g>
+  <g transform="translate(40 0)" font-family="'Segoe UI', Inter, Roboto, Arial, sans-serif" font-size="20" font-weight="600">
+    <rect x="740" y="160" width="140" height="60" rx="14" fill="#12527D" stroke="#4FD8C4" stroke-width="2"/>
+    <text x="810" y="197" fill="#F4F7FA" text-anchor="middle">Chat model</text>
+    <rect x="740" y="380" width="140" height="60" rx="14" fill="#12527D" stroke="#4FD8C4" stroke-width="2"/>
+    <text x="810" y="417" fill="#F4F7FA" text-anchor="middle">Retriever</text>
+    <rect x="1000" y="270" width="140" height="60" rx="14" fill="#35C2AE"/>
+    <text x="1070" y="307" fill="#0B2A42" text-anchor="middle">Agent</text>
+    <circle cx="1170" cy="450" r="14" fill="#F4F7FA"/>
+  </g>
+
+  <!-- mark -->
+  <g transform="translate(96 150) scale(2.2)">
+    <rect width="48" height="48" rx="11" fill="#12527D"/>
+    <path d="M11 15.5 H37 L24 37 Z" fill="none" stroke="#4FD8C4" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="M24 15.5 V37" stroke="#4FD8C4" stroke-width="3.2" stroke-linecap="round"/>
+    <circle cx="11" cy="15.5" r="4.6" fill="#F4F7FA"/>
+    <circle cx="37" cy="15.5" r="4.6" fill="#F4F7FA"/>
+    <circle cx="24" cy="37" r="4.6" fill="#4FD8C4"/>
+  </g>
+
+  <g font-family="'Segoe UI', Inter, Roboto, Arial, sans-serif">
+    <text x="96" y="340" font-size="88" font-weight="700" fill="#F4F7FA">Keel<tspan fill="#4FD8C4">flow</tspan></text>
+    <text x="96" y="400" font-size="32" fill="#C9D6E2">Flowise, maintained.</text>
+    <text x="96" y="448" font-size="26" fill="#9FB3C6">Security fixes · Apache-2.0 only</text>
+    <text x="96" y="486" font-size="26" fill="#9FB3C6">Your flows, keys and data work as they are</text>
+    <text x="96" y="548" font-size="24" fill="#6F8BA3">github.com/Perruer/keelflow</text>
+  </g>
+</svg>
