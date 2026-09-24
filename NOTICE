@@ -1,0 +1,15 @@
+Keelflow
+Copyright 2026 Perruer and the Keelflow contributors
+
+This product is a fork of Flowise (https://github.com/FlowiseAI/Flowise),
+Copyright (c) 2023-present FlowiseAI, Inc., licensed under the Apache
+License, Version 2.0.
+
+Flowise 3.x also contained code under the FlowiseAI Commercial License
+(packages/server/src/enterprise and packages/server/src/IdentityManager.ts).
+That code is not part of Keelflow and was removed from the repository
+history. Keelflow's account, session and permission code
+(packages/server/src/identity) was written independently and is licensed
+under the Apache License, Version 2.0.
+
+Third-party components keep the licenses given by their authors.

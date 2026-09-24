@@ -1,243 +1,117 @@
-<!-- markdownlint-disable MD030 -->
-
 <p align="center">
-<img src="https://github.com/FlowiseAI/Flowise/blob/main/images/flowise_white.svg#gh-light-mode-only">
-<img src="https://github.com/FlowiseAI/Flowise/blob/main/images/flowise_dark.svg#gh-dark-mode-only">
+  <img src="https://raw.githubusercontent.com/Perruer/keelflow/main/images/keelflow_light.png#gh-light-mode-only" width="360" alt="Keelflow">
+  <img src="https://raw.githubusercontent.com/Perruer/keelflow/main/images/keelflow_dark.png#gh-dark-mode-only" width="360" alt="Keelflow">
 </p>
 
-<div align="center">
+<p align="center">
+  <b>Build AI agents and LLM workflows visually. Self-hosted, security-maintained continuation of Flowise.</b>
+</p>
 
-[![Release Notes](https://img.shields.io/github/release/FlowiseAI/Flowise)](https://github.com/FlowiseAI/Flowise/releases)
-[![Discord](https://img.shields.io/discord/1087698854775881778?label=Discord&logo=discord)](https://discord.gg/jbaHfsRVBW)
-[![Twitter Follow](https://img.shields.io/twitter/follow/FlowiseAI?style=social)](https://twitter.com/FlowiseAI)
-[![GitHub star chart](https://img.shields.io/github/stars/FlowiseAI/Flowise?style=social)](https://star-history.com/#FlowiseAI/Flowise)
-[![GitHub fork](https://img.shields.io/github/forks/FlowiseAI/Flowise?style=social)](https://github.com/FlowiseAI/Flowise/fork)
+<p align="center">
+  <a href="https://github.com/Perruer/keelflow/actions/workflows/main.yml"><img src="https://github.com/Perruer/keelflow/actions/workflows/main.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/Perruer/keelflow/releases"><img src="https://img.shields.io/github/v/release/Perruer/keelflow" alt="Release"></a>
+  <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="Apache-2.0"></a>
+</p>
 
-English | [繁體中文](./i18n/README-TW.md) | [简体中文](./i18n/README-ZH.md) | [日本語](./i18n/README-JA.md) | [한국어](./i18n/README-KR.md)
+<p align="center">English · <a href="README.ru.md">Русский</a></p>
 
-</div>
+---
 
-<h2>Flowise has been archived. Refer to [Future of Flowise](https://github.com/FlowiseAI/Flowise/discussions/6727)</h2>
+Flowise was archived on August 13, 2026 and reached end of life on August 31. Security advisories kept being published after that without fixes, and thousands of instances are still reachable from the internet.
 
-<h3>Build AI Agents, Visually</h3>
-<a href="https://github.com/FlowiseAI/Flowise">
-<img width="100%" src="https://github.com/FlowiseAI/Flowise/blob/main/images/flowise_agentflow.gif?raw=true"></a>
+Keelflow starts from Flowise 3.1.4 and keeps it safe to run: vulnerabilities fixed, dependencies updated, and every file under the Apache-2.0 license. Your flows, credentials, API keys and database work as they are.
 
-## 📚 Table of Contents
+## What's different from Flowise 3.1.4
 
--   [⚡ Quick Start](#-quick-start)
--   [🐳 Docker](#-docker)
--   [👨‍💻 Developers](#-developers)
--   [🌱 Env Variables](#-env-variables)
--   [📖 Documentation](#-documentation)
--   [🌐 Self Host](#-self-host)
--   [☁️ Flowise Cloud](#️-flowise-cloud)
--   [🙋 Support](#-support)
--   [🙌 Contributing](#-contributing)
--   [📄 License](#-license)
+| | Flowise 3.1.4 | Keelflow 3.2 |
+| --- | --- | --- |
+| License | Apache-2.0 plus the FlowiseAI Commercial License: the sign-in code of the open source edition was commercial | Apache-2.0 only. The commercial code is removed from the history and replaced by an independent implementation |
+| Accounts | Owner (open source); users, roles, SSO (paid) | One owner account plus API keys with per-permission scopes |
+| Sessions | JWT in cookies | Server-side sessions with hashed tokens; a password change signs out everywhere; sign-in throttling |
+| Known advisories in dependencies | 385 (19 critical) | 153 (1 critical, install-time only) |
+| Custom JavaScript sandbox | vm2 3.11.2 with 9 critical sandbox escapes | vm2 3.12.2 |
+| Datasets, evaluations, evaluators, server logs | Paid plans only | Included |
+| Third-party requests from the web UI | Rewardful affiliate tracker, Google Fonts, GitHub API on every page | None |
+| Model list | Fetched from GitHub on every use | Shipped with the app; a custom URL or file is optional |
+| `X-Forwarded-For` | Trusted from anyone by default | Trusted from local and private networks by default |
 
-## ⚡Quick Start
+Fixed advisories and hardening are listed in the [changelog](CHANGELOG.md). Everything that is not listed there works as in Flowise 3.1.4: the same nodes, agentflows, document stores, API and embed widget.
 
-Download and Install [NodeJS](https://nodejs.org/en/download) >= 20.0.0
+## Quick start
 
-1. Install Flowise
-    ```bash
-    npm install -g flowise
-    ```
-2. Start Flowise
+### Docker
 
-    ```bash
-    npx flowise start
-    ```
+```bash
+docker run -d --name keelflow -p 3000:3000 -v ~/.keelflow:/home/node/.keelflow ghcr.io/perruer/keelflow:latest
+```
 
-3. Open [http://localhost:3000](http://localhost:3000)
+Open http://localhost:3000 and create the owner account. Images are built for `linux/amd64` and `linux/arm64`.
 
-## 🐳 Docker
+A `docker compose` setup (with queue mode and Postgres examples) is in [docker/](docker/).
 
-### Docker Compose
+### From source
 
-1. Clone the Flowise project
-2. Go to `docker` folder at the root of the project
-3. Copy `.env.example` file, paste it into the same location, and rename to `.env` file
-4. `docker compose up -d`
-5. Open [http://localhost:3000](http://localhost:3000)
-6. You can bring the containers down by `docker compose stop`
+Node.js 24 and pnpm 10 are required.
 
-### Docker Image
+```bash
+git clone https://github.com/Perruer/keelflow.git
+cd keelflow
+pnpm install
+pnpm build        # needs about 4 GB of memory: export NODE_OPTIONS=--max-old-space-size=4096
+pnpm start
+```
 
-1. Build the image locally:
+## Migrating from Flowise
 
-    ```bash
-    docker build --no-cache -t flowise .
-    ```
+1. Stop Flowise and back up its data folder (`~/.flowise`) or database.
+2. Start Keelflow on the same data:
+    - **Docker:** replace the image `flowiseai/flowise` with `ghcr.io/perruer/keelflow` and keep your volumes and environment variables. A volume mounted at `/home/node/.flowise` is picked up automatically.
+    - **Source or npm install:** Keelflow uses `~/.flowise` as long as `~/.keelflow` does not exist. `DATABASE_*`, `SECRETKEY_PATH`, `FLOWISE_SECRETKEY_OVERWRITE` and the other `FLOWISE_*` variables keep their names.
+3. Sign in with the owner's email and password from Flowise. Credentials stay readable as long as the encryption key is the same.
 
-2. Run image:
+What does not carry over: other user accounts (from Flowise Enterprise), SSO, invitations, roles and switching between several workspaces. API keys keep working with the permissions they had. If a database from Flowise Enterprise has several workspaces, choose the one to use with `KEELFLOW_WORKSPACE_ID`.
 
-    ```bash
-    docker run -d --name flowise -p 3000:3000 flowise
-    ```
+The `@flowiseai/agentflow` and `@flowiseai/observe` SDK packages are not part of Keelflow.
 
-3. Stop image:
+## Configuration
 
-    ```bash
-    docker stop flowise
-    ```
+Settings are environment variables; see [packages/server/.env.example](packages/server/.env.example). Those added by Keelflow:
 
-## 👨‍💻 Developers
+| Variable | Default | |
+| --- | --- | --- |
+| `KEELFLOW_HOME` | `~/.keelflow` | Folder for the SQLite database, encryption key, uploads and logs |
+| `SESSION_EXPIRY_IN_MINUTES` | `10080` (7 days) | A sign-in ends after this long without use |
+| `SESSION_MAX_AGE_IN_MINUTES` | `43200` (30 days) | A sign-in ends after this long in any case |
+| `TRUST_PROXY` | local and private networks | `true` trusts every proxy, as Flowise did |
+| `KEELFLOW_WORKSPACE_ID` | oldest workspace | Only for databases from Flowise Enterprise |
 
-Flowise has 3 different modules in a single mono repository.
+Forgot the owner's password? Reset it on the server; this also ends every existing sign-in:
 
--   `server`: Node backend to serve API logics
--   `ui`: React frontend
--   `components`: Third-party nodes integrations
--   `api-documentation`: Auto-generated swagger-ui API docs from express
+```bash
+docker exec keelflow node /app/bin/run user owner@example.com 'New-password-1'
+```
 
-### Prerequisite
+From a source checkout the same command is `pnpm user owner@example.com 'New-password-1'`.
 
--   Install [PNPM](https://pnpm.io/installation)
-    ```bash
-    npm i -g pnpm
-    ```
+## Documentation
 
-### Setup
+The [Flowise documentation](https://docs.flowiseai.com) describes nodes, flows, the API and the embed widget, and applies to Keelflow. Sign-in, users and SSO work differently, as described above.
 
-1.  Clone the repository:
+## Security
 
-    ```bash
-    git clone https://github.com/FlowiseAI/Flowise.git
-    ```
+Report vulnerabilities privately through [GitHub Security Advisories](https://github.com/Perruer/keelflow/security/advisories/new). See [SECURITY.md](SECURITY.md).
 
-2.  Go into repository folder:
+Custom JavaScript nodes and tools run in vm2. It is not a strong isolation boundary: only let people you trust edit flows, and set `E2B_APIKEY` to run code in E2B sandboxes instead.
 
-    ```bash
-    cd Flowise
-    ```
+## Support the project
 
-3.  Install all dependencies of all modules:
+Keelflow is maintained in my free time. If it keeps your agents running, you can support it:
 
-    ```bash
-    pnpm install
-    ```
+- [Boosty](https://boosty.to/mikio_kuroki/donate)
+- USDT / TRX (TRC-20): `TXUBW4e88SDTfrnJRKfbhYfFcggufbonc1`
+- USDT / USDC / ETH (ERC-20): `0x1378491169064702786b2E5b58c6375776177E8A`
+- TON / USDT (TON): `UQAhI7EKzoa-JuKOfv0ULMzA3FrmpxsDkXj8Qevwj2z1cMRN`
 
-4.  Build all the code:
+## License
 
-    ```bash
-    pnpm build
-    ```
-
-    <details>
-    <summary>Exit code 134 (JavaScript heap out of memory)</summary>  
-    If you get this error when running the above `build` script, try increasing the Node.js heap size and run the script again:
-
-    ```bash
-    # macOS / Linux / Git Bash
-    export NODE_OPTIONS="--max-old-space-size=4096"
-
-    # Windows PowerShell
-    $env:NODE_OPTIONS="--max-old-space-size=4096"
-
-    # Windows CMD
-    set NODE_OPTIONS=--max-old-space-size=4096
-    ```
-
-    Then run:
-
-    ```bash
-    pnpm build
-    ```
-
-    </details>
-
-5.  Start the app:
-
-    ```bash
-    pnpm start
-    ```
-
-    You can now access the app on [http://localhost:3000](http://localhost:3000)
-
-6.  For development build:
-
-    -   Create `.env` file and specify the `VITE_PORT` (refer to `.env.example`) in `packages/ui`
-    -   Create `.env` file and specify the `PORT` (refer to `.env.example`) in `packages/server`
-    -   Run:
-
-        ```bash
-        pnpm dev
-        ```
-
-    Any code changes will reload the app automatically on [http://localhost:8080](http://localhost:8080)
-
-## 🌱 Env Variables
-
-Flowise supports different environment variables to configure your instance. You can specify the following variables in the `.env` file inside `packages/server` folder. Read [more](https://github.com/FlowiseAI/Flowise/blob/main/CONTRIBUTING.md#-env-variables)
-
-## 📖 Documentation
-
-You can view the Flowise Docs [here](https://docs.flowiseai.com/)
-
-## 🌐 Self Host
-
-Deploy Flowise self-hosted in your existing infrastructure, we support various [deployments](https://docs.flowiseai.com/configuration/deployment)
-
--   [AWS](https://docs.flowiseai.com/configuration/deployment/aws)
--   [Azure](https://docs.flowiseai.com/configuration/deployment/azure)
--   [Digital Ocean](https://docs.flowiseai.com/configuration/deployment/digital-ocean)
--   [GCP](https://docs.flowiseai.com/configuration/deployment/gcp)
--   [Alibaba Cloud](https://computenest.console.aliyun.com/service/instance/create/default?type=user&ServiceName=Flowise社区版)
--   <details>
-      <summary>Others</summary>
-
-    -   [Railway](https://docs.flowiseai.com/configuration/deployment/railway)
-
-        [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/pn4G8S?referralCode=WVNPD9)
-
-    -   [Northflank](https://northflank.com/stacks/deploy-flowiseai)
-
-        [![Deploy to Northflank](https://assets.northflank.com/deploy_to_northflank_smm_36700fb050.svg)](https://northflank.com/stacks/deploy-flowiseai)
-
-    -   [Render](https://docs.flowiseai.com/configuration/deployment/render)
-
-        [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://docs.flowiseai.com/configuration/deployment/render)
-
-    -   [HuggingFace Spaces](https://docs.flowiseai.com/configuration/deployment/hugging-face)
-
-        <a href="https://huggingface.co/spaces/FlowiseAI/Flowise"><img src="https://huggingface.co/datasets/huggingface/badges/raw/main/open-in-hf-spaces-sm.svg" alt="HuggingFace Spaces"></a>
-
-    -   [Elestio](https://elest.io/open-source/flowiseai)
-
-        [![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/flowiseai)
-
-    -   [Sealos](https://template.sealos.io/deploy?templateName=flowise)
-
-        [![Deploy on Sealos](https://sealos.io/Deploy-on-Sealos.svg)](https://template.sealos.io/deploy?templateName=flowise)
-
-    -   [RepoCloud](https://repocloud.io/details/?app_id=29)
-
-        [![Deploy on RepoCloud](https://d16t0pc4846x52.cloudfront.net/deploy.png)](https://repocloud.io/details/?app_id=29)
-
-      </details>
-
-## ☁️ Flowise Cloud
-
-Get Started with [Flowise Cloud](https://flowiseai.com/).
-
-## 🙋 Support
-
-Feel free to ask any questions, raise problems, and request new features in [Discussion](https://github.com/FlowiseAI/Flowise/discussions).
-
-## 🙌 Contributing
-
-Thanks go to these awesome contributors
-
-<a href="https://github.com/FlowiseAI/Flowise/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=FlowiseAI/Flowise" />
-</a><br><br>
-
-See [Contributing Guide](CONTRIBUTING.md). Reach out to us at [Discord](https://discord.gg/jbaHfsRVBW) if you have any questions or issues.
-
-[![Star History Chart](https://api.star-history.com/svg?repos=FlowiseAI/Flowise&type=Timeline)](https://star-history.com/#FlowiseAI/Flowise&Date)
-
-## 📄 License
-
-Source code in this repository is made available under the [Apache License Version 2.0](LICENSE.md).
+[Apache-2.0](LICENSE.md). Keelflow is a fork of [Flowise](https://github.com/FlowiseAI/Flowise) by FlowiseAI, Inc.; see [NOTICE](NOTICE). Keelflow is not affiliated with or endorsed by FlowiseAI, Inc.
