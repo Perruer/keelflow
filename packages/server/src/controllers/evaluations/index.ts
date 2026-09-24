@@ -4,6 +4,10 @@ import { StatusCodes } from 'http-status-codes'
 import evaluationsService from '../../services/evaluations'
 import { getPageAndLimitParams } from '../../utils/pagination'
 
+// Evaluation runs call this server's prediction API. APP_URL is optional in Keelflow,
+// so fall back to the local port instead of requesting "undefined/api/v1/...".
+const getSelfBaseURL = () => (process.env.APP_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/$/, '')
+
 const createEvaluation = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (!req.body) {
@@ -29,7 +33,7 @@ const createEvaluation = async (req: Request, res: Response, next: NextFunction)
         const body = req.body
         body.workspaceId = workspaceId
 
-        const baseURL = `${process.env.APP_URL}`
+        const baseURL = getSelfBaseURL()
         const apiResponse = await evaluationsService.createEvaluation(body, baseURL, orgId, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
@@ -53,7 +57,7 @@ const runAgain = async (req: Request, res: Response, next: NextFunction) => {
                 `Error: evaluationsService.runAgain - workspace ${workspaceId} not found!`
             )
         }
-        const baseURL = `${process.env.APP_URL}`
+        const baseURL = getSelfBaseURL()
         const apiResponse = await evaluationsService.runAgain(req.params.id, baseURL, orgId, workspaceId)
         return res.json(apiResponse)
     } catch (error) {
