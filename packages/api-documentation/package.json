@@ -1,6 +1,6 @@
 {
     "name": "keelflow-api-docs",
-    "version": "3.2.0",
+    "version": "3.2.1",
     "description": "Keelflow API documentation server",
     "homepage": "https://github.com/Perruer/keelflow",
     "license": "Apache-2.0",

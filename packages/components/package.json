@@ -1,6 +1,6 @@
 {
     "name": "keelflow-components",
-    "version": "3.2.0",
+    "version": "3.2.1",
     "description": "Nodes and integrations for Keelflow",
     "homepage": "https://github.com/Perruer/keelflow",
     "license": "Apache-2.0",

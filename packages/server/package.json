@@ -1,6 +1,6 @@
 {
     "name": "keelflow",
-    "version": "3.2.0",
+    "version": "3.2.1",
     "description": "Keelflow server: build AI agents and LLM workflows visually. Security-maintained continuation of Flowise.",
     "homepage": "https://github.com/Perruer/keelflow",
     "license": "Apache-2.0",

@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.2.1 — unreleased
+## 3.2.1 — 2026-09-25
 
 ### Changed
 
