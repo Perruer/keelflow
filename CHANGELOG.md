@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.2.1 — unreleased
+
+### Changed
+
+- New installations keep their data in the platform's data folder instead of another dot folder in the home directory: `$XDG_DATA_HOME/keelflow` (by default `~/.local/share/keelflow`) on Linux, `~/Library/Application Support/keelflow` on macOS, `%LOCALAPPDATA%\keelflow` on Windows. Existing data is never moved: a `~/.keelflow` or `~/.flowise` that holds files keeps being used, and so does an empty `~/.keelflow` such as the volume mount point in the Docker image. `KEELFLOW_HOME` still overrides everything.
+
+### Fixed
+
+- Evaluations fall back to the local server when `APP_URL` is not set.
+- The stats endpoint answers a malformed request with a JSON 400 instead of echoing the parser error.
+- The data and log folders are created with their parent folders.
+
 ## 3.2.0 — 2026-09-24
 
 First Keelflow release, based on Flowise 3.1.4 (the last Flowise release, July 29, 2026). Databases, flows, credentials and API keys from Flowise 3.x work without changes.

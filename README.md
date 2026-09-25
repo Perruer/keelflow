@@ -66,7 +66,7 @@ pnpm start
 1. Stop Flowise and back up its data folder (`~/.flowise`) or database.
 2. Start Keelflow on the same data:
     - **Docker:** replace the image `flowiseai/flowise` with `ghcr.io/perruer/keelflow` and keep your volumes and environment variables. A volume mounted at `/home/node/.flowise` is picked up automatically.
-    - **From source:** Keelflow uses `~/.flowise` as long as `~/.keelflow` is missing or empty. `DATABASE_*`, `SECRETKEY_PATH`, `FLOWISE_SECRETKEY_OVERWRITE` and the other `FLOWISE_*` variables keep their names.
+    - **From source:** Keelflow keeps using `~/.flowise` as long as `~/.keelflow` and the Keelflow data folder hold no data. `DATABASE_*`, `SECRETKEY_PATH`, `FLOWISE_SECRETKEY_OVERWRITE` and the other `FLOWISE_*` variables keep their names.
 3. Sign in with the owner's email and password from Flowise. Credentials stay readable as long as the encryption key is the same.
 
 What does not carry over: other user accounts (from Flowise Enterprise), SSO, invitations, roles and switching between several workspaces. API keys keep working with the permissions they had. If a database from Flowise Enterprise has several workspaces, choose the one to use with `KEELFLOW_WORKSPACE_ID`.
@@ -79,7 +79,7 @@ Settings are environment variables; see [packages/server/.env.example](packages/
 
 | Variable | Default | |
 | --- | --- | --- |
-| `KEELFLOW_HOME` | `~/.keelflow` | Folder for the SQLite database, encryption key, uploads and logs |
+| `KEELFLOW_HOME` | platform data folder | Folder for the SQLite database, encryption key, uploads and logs. Default: `$XDG_DATA_HOME/keelflow` (`~/.local/share/keelflow`) on Linux, `~/Library/Application Support/keelflow` on macOS, `%LOCALAPPDATA%\keelflow` on Windows; an existing `~/.keelflow` or `~/.flowise` with data keeps being used |
 | `SESSION_EXPIRY_IN_MINUTES` | `10080` (7 days) | A sign-in ends after this long without use |
 | `SESSION_MAX_AGE_IN_MINUTES` | `43200` (30 days) | A sign-in ends after this long in any case |
 | `TRUST_PROXY` | local and private networks | `true` trusts every proxy, as Flowise did |

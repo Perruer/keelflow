@@ -19,7 +19,7 @@ const logDir = config.logging.dir
 
 // Create the log directory if it doesn't exist
 if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir)
+    fs.mkdirSync(logDir, { recursive: true })
 }
 
 const logger = createLogger({

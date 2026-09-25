@@ -16,7 +16,7 @@ export const init = async (): Promise<void> => {
     let homePath
     let flowisePath = getDataDir()
     if (!fs.existsSync(flowisePath)) {
-        fs.mkdirSync(flowisePath)
+        fs.mkdirSync(flowisePath, { recursive: true })
     }
     switch (process.env.DATABASE_TYPE) {
         case 'sqlite':

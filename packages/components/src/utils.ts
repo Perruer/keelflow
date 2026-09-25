@@ -744,17 +744,43 @@ export const getUserHome = (): string => {
 }
 
 /**
- * Folder for the database, keys, uploads and logs when no explicit path is configured:
- * KEELFLOW_HOME if set, otherwise ~/.keelflow. An existing ~/.flowise is used while
- * ~/.keelflow is missing or empty, so a Flowise installation keeps its data.
+ * The platform's folder for application data: $XDG_DATA_HOME/keelflow (default
+ * ~/.local/share/keelflow), ~/Library/Application Support/keelflow on macOS and
+ * %LOCALAPPDATA%\keelflow on Windows.
+ */
+export const getPlatformDataDir = (): string => {
+    const home = getUserHome()
+    if (process.platform === 'win32') {
+        return path.join(process.env.LOCALAPPDATA || path.join(home, 'AppData', 'Local'), 'keelflow')
+    }
+    if (process.platform === 'darwin') {
+        return path.join(home, 'Library', 'Application Support', 'keelflow')
+    }
+    const xdgDataHome = process.env.XDG_DATA_HOME
+    // The XDG spec says to ignore relative paths.
+    return path.join(xdgDataHome && path.isAbsolute(xdgDataHome) ? xdgDataHome : path.join(home, '.local', 'share'), 'keelflow')
+}
+
+/**
+ * Folder for the database, keys, uploads and logs when no explicit path is configured.
+ *
+ * KEELFLOW_HOME wins. Otherwise data that already exists is never moved: the first of
+ * ~/.keelflow, the platform data folder (see getPlatformDataDir) and ~/.flowise that holds
+ * files is used, so installations from Keelflow 3.2.0 and from Flowise keep working. An empty
+ * ~/.keelflow that exists, such as the volume mount point in the Docker image, is used next.
+ * New installations get the platform data folder instead of another dot folder in $HOME.
  */
 export const getDataDir = (): string => {
     if (process.env.KEELFLOW_HOME) return process.env.KEELFLOW_HOME
     const keelflowDir = path.join(getUserHome(), '.keelflow')
+    const platformDir = getPlatformDataDir()
     const flowiseDir = path.join(getUserHome(), '.flowise')
-    const isEmpty = (dir: string) => !fs.existsSync(dir) || fs.readdirSync(dir).length === 0
-    if (isEmpty(keelflowDir) && !isEmpty(flowiseDir)) return flowiseDir
-    return keelflowDir
+    const hasFiles = (dir: string) => fs.existsSync(dir) && fs.readdirSync(dir).length > 0
+    for (const dir of [keelflowDir, platformDir, flowiseDir]) {
+        if (hasFiles(dir)) return dir
+    }
+    if (fs.existsSync(keelflowDir)) return keelflowDir
+    return platformDir
 }
 
 /**
