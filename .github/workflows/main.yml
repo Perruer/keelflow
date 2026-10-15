@@ -25,11 +25,11 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 60
         steps:
-            - uses: actions/checkout@v6
-            - uses: pnpm/action-setup@v4
+            - uses: actions/checkout@v7
+            - uses: pnpm/action-setup@v6
               with:
                   version: 10.26.0
-            - uses: actions/setup-node@v6
+            - uses: actions/setup-node@v7
               with:
                   node-version: 24
                   cache: pnpm
@@ -55,7 +55,7 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 30
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/e2e
               with:
                   command: node test/auth-flow.mjs http://localhost:3000
@@ -82,7 +82,7 @@ jobs:
             DATABASE_PASSWORD: keelflow
             DATABASE_NAME: keelflow
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/e2e
               with:
                   command: node test/auth-flow.mjs http://localhost:3000
@@ -110,7 +110,7 @@ jobs:
             DATABASE_PASSWORD: keelflow
             DATABASE_NAME: keelflow
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/e2e
               with:
                   command: node test/auth-flow.mjs http://localhost:3000
@@ -138,7 +138,7 @@ jobs:
             DATABASE_PASSWORD: keelflow
             DATABASE_NAME: keelflow
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/e2e
               with:
                   command: node test/auth-flow.mjs http://localhost:3000
@@ -149,17 +149,17 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 30
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - name: Fetch flowise@3.1.4 and build a database with its migrations
               run: |
                   mkdir -p "$RUNNER_TEMP/flowise"
                   cd "$RUNNER_TEMP/flowise"
                   npm pack flowise@3.1.4 --silent
                   tar xzf flowise-3.1.4.tgz
-            - uses: pnpm/action-setup@v4
+            - uses: pnpm/action-setup@v6
               with:
                   version: 10.26.0
-            - uses: actions/setup-node@v6
+            - uses: actions/setup-node@v7
               with:
                   node-version: 24
                   cache: pnpm
@@ -188,7 +188,7 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 60
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - run: docker build -t keelflow:ci .
             - name: Start the image and wait for the API
               run: |
